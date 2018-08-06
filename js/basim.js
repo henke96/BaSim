@@ -208,24 +208,26 @@ function rDrawVerticalLine(x, y, length) {
 }
 function rSetFilledRect(x, y, width, height) {
 	let i = rXYToI(x, y);
+	let rowDelta = width + rCanvasWidth;
 	let endYI = i - height*rCanvasWidth;
 	while (i > endYI) {
 		let endXI = i + width;
 		for (; i < endXI; ++i) {
 			rPixels32[i] = rDrawColor;
 		}
-		i -= width + rCanvasWidth;
+		i -= rowDelta;
 	}
 }
 function rDrawFilledRect(x, y, width, height) {
 	let i = rXYToI(x, y);
+	let rowDelta = width + rCanvasWidth;
 	let endYI = i - height*rCanvasWidth;
 	while (i > endYI) {
 		let endXI = i + width;
 		for (; i < endXI; ++i) {
 			rDrawPixel(i);
 		}
-		i -= width + rCanvasWidth;
+		i -= rowDelta;
 	}
 }
 function rDrawOutlinedRect(x, y, width, height) {
