@@ -38,11 +38,11 @@ function drawMap() {
 			let tileFlag = getTileFlag(x, y);
             if ((tileFlag & LOS_FULL_MASK) !== 0) {
                 rSetDrawColor(0, 0, 0, 255);
-                rrFill(x, y);
+                rrFillOpaque(x, y);
             } else  {
                 if ((tileFlag & MOVE_FULL_MASK) !== 0) {
                     rSetDrawColor(127, 127, 127, 255);
-                    rrFill(x, y);
+                    rrFillOpaque(x, y);
                 }
                 if ((tileFlag & LOS_EAST_MASK) !== 0) {
                     rSetDrawColor(0, 0, 0, 255);
@@ -99,6 +99,9 @@ function rrSetSize(widthTiles, heightTiles) {
 	rrWidthTiles = widthTiles;
 	rrHeightTiles = heightTiles;
 	rResizeCanvas(rrTileSize*rrWidthTiles, rrTileSize*rrHeightTiles);
+}
+function rrFillOpaque(x, y) {
+	rSetFilledRect(x*rrTileSize, y*rrTileSize, rrTileSize, rrTileSize);
 }
 function rrFill(x, y) {
 	rDrawFilledRect(x*rrTileSize, y*rrTileSize, rrTileSize, rrTileSize);
@@ -159,55 +162,70 @@ function rResizeCanvas(width, height) {
 	rCanvas.height = height;
 	rCanvasWidth = width;
 	rCanvasHeight = height;
+	rCanvasYFixOffset = (rCanvasHeight - 1)*rCanvasWidth;
 	rImageData = rContext.createImageData(width, height);
 	rPixels = new ArrayBuffer(rImageData.data.length);
 	rPixels8 = new Uint8ClampedArray(rPixels);
 	rPixels32 = new Uint32Array(rPixels);
 }
 function rSetDrawColor(r, g, b, a) {
-	rDrawColorR = r;
-	rDrawColorG = g << 8;
-	rDrawColorB = b << 16;
+	rDrawColorRB = r | (b << 16);
+	rDrawColorG = rPIXEL_ALPHA | (g << 8);
+	rDrawColor = rDrawColorRB | rDrawColorG;
 	rDrawColorA = a + 1;
 }
 function rClear() {
-	let color = rPIXEL_ALPHA | rDrawColorR | rDrawColorG | rDrawColorB;
 	let endI = rPixels32.length;
 	for (let i = 0; i < endI; ++i) {
-		rPixels32[i] = color;
+		rPixels32[i] = rDrawColor;
 	}
 }
 function rPresent() {
 	rImageData.data.set(rPixels8);
 	rContext.putImageData(rImageData, 0, 0);
 }
-function rDrawPixel(x, y) {
-	let i = x + (rCanvasHeight - 1 - y)*rCanvasWidth;
+function rDrawPixel(i) {
 	let color = rPixels32[i];
-	let deltaR = rDrawColorA*(rDrawColorR - (color & 0xFF));
-	let deltaG = rDrawColorA*(rDrawColorG - (color & 0xFF00)) & 0xFFFF0000;
-	let deltaB = rDrawColorA*(rDrawColorB - (color & 0xFF0000)) & 0xFF000000;
-	rPixels32[i] += (deltaR + deltaG + deltaB >> 8);
+	let oldRB = color & 0xFF00FF;
+	let oldAG = color & 0xFF00FF00;
+	let rb = oldRB + (rDrawColorA*(rDrawColorRB - oldRB) >> 8) & 0xFF00FF;
+	let g = oldAG + (rDrawColorA*(rDrawColorG - oldAG) >> 8) & 0xFF00FF00;
+	rPixels32[i] = rb | g;
 }
 function rDrawHorizontalLine(x, y, length) {
-	let endX = x + length;
-	for (; x < endX; ++x) {
-		rDrawPixel(x, y);
+	let i = rXYToI(x, y)
+	let endI = i + length;
+	for (; i < endI; ++i) {
+		rDrawPixel(i);
 	}
 }
 function rDrawVerticalLine(x, y, length) {
-	let endY = y + length;
-	for (; y < endY; ++y) {
-		rDrawPixel(x, y);
+	let i = rXYToI(x, y);
+	let endI = i - length*rCanvasWidth;
+	for (; i > endI; i -= rCanvasWidth) {
+		rDrawPixel(i);
+	}
+}
+function rSetFilledRect(x, y, width, height) {
+	let i = rXYToI(x, y);
+	let endYI = i - height*rCanvasWidth;
+	while (i > endYI) {
+		let endXI = i + width;
+		for (; i < endXI; ++i) {
+			rPixels32[i] = rDrawColor;
+		}
+		i -= width + rCanvasWidth;
 	}
 }
 function rDrawFilledRect(x, y, width, height) {
-	let endX = x + width;
-	let endY = y + height;
-	for (let curX = x; curX < endX; ++curX) {
-		for (let curY = y; curY < endY; ++curY) {
-			rDrawPixel(curX, curY);
+	let i = rXYToI(x, y);
+	let endYI = i - height*rCanvasWidth;
+	while (i > endYI) {
+		let endXI = i + width;
+		for (; i < endXI; ++i) {
+			rDrawPixel(i);
 		}
+		i -= width + rCanvasWidth;
 	}
 }
 function rDrawOutlinedRect(x, y, width, height) {
@@ -216,25 +234,29 @@ function rDrawOutlinedRect(x, y, width, height) {
 	rDrawVerticalLine(x, y + 1, height - 2);
 	rDrawVerticalLine(x + width - 1, y + 1, height - 2);
 }
-function rDrawCone(x, y, width) {
+function rDrawCone(x, y, width) { // Not optimised to use i yet
 	let lastX = x + width - 1;
 	let endI = (width >>> 1) + (width & 1);
 	for (let i = 0; i < endI; ++i) {
-		rDrawPixel(x + i, y);
-		rDrawPixel(lastX - i, y);
+		rDrawPixel(rXYToI(x + i, y));
+		rDrawPixel(rXYToI(lastX - i, y));
 		++y;
 	}
+}
+function rXYToI(x, y) {
+	return rCanvasYFixOffset + x - y*rCanvasWidth;
 }
 var rCanvas;
 var rCanvasWidth;
 var rCanvasHeight;
+var rCanvasYFixOffset;
 var rContext;
 var rImageData;
 var rPixels;
 var rPixels8;
 var rPixels32;
-var rDrawColorR;
+var rDrawColor;
+var rDrawColorRB;
 var rDrawColorG;
-var rDrawColorB;
 var rDrawColorA;
 //}
