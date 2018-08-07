@@ -170,7 +170,6 @@ ruRunner.prototype.setDestinationBlughhhh = function() {
 }
 ruRunner.prototype.setDestinationRandomWalk = function() {
 	let rnd = Math.floor(Math.random() * 6);
-	console.log(rnd);
 	if (rnd < 4) {
 		this.destinationX = this.x;
 		this.destinationY = this.y - 5;
