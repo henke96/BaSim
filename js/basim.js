@@ -14,7 +14,10 @@ function init() {
 function mainLoop() {
 	baUpdate();
 	mDrawMap();
-	baDraw();
+	baDrawDetails();
+	baDrawRunners();
+	mDrawGrid();
+	baDrawOverlays();
 	rPresent();
 }
 //{ Food - f
@@ -260,7 +263,64 @@ function baUpdate() {
 		baRunners[i].tick();
 	}
 }
-function baDraw() {
+function baDrawOverlays() { 
+    if (mCurrentMap !== mWAVE_1_TO_9 && mCurrentMap !== mWAVE10) {
+        return;
+    }
+    rSetDrawColor(160, 82, 45, 255);
+    rrOutline(45, 34);
+    rrOutline(15, 33);
+    rSetDrawColor(255, 0, 0, 255);
+    if (mCurrentMap === mWAVE_1_TO_9) {
+        rrOutline(18, 45);
+    } else {
+        rrOutline(18, 46);
+    }
+    rrOutline(24, 47);
+    rSetDrawColor(0, 0, 255, 255);
+    if (mCurrentMap === mWAVE_1_TO_9) {
+        rrOutline(36, 47);
+    } else {
+        rrOutline(42, 46);
+    }
+    rSetDrawColor(0, 255, 0, 255);
+    if (mCurrentMap === mWAVE_1_TO_9) {
+        rrOutline(42, 45);
+    } else {
+        rrOutline(36, 47);
+    }
+}
+function baDrawDetails() {
+    if (mCurrentMap !== mWAVE_1_TO_9 && currentMap !== mWAVE10) {
+        return;
+    }
+    rSetDrawColor(160, 82, 45, 255);
+    rrCone(40, 40);
+    rrCone(40, 39);
+    rrCone(41, 40);
+    rrCone(41, 39);
+    rrCone(43, 39);
+    rrCone(36, 42);
+    rrCone(36, 43);
+    rrCone(37, 42);
+    rrCone(37, 43);
+    rrCone(39, 44);
+    rrCone(43, 30);
+    rrCone(43, 31);
+    rrCone(44, 30);
+    rrCone(44, 31);
+    rrCone(45, 32);
+    if (mCurrentMap === mWAVE_1_TO_9) {
+        rrFillItem(29, 46);
+        rrFillItem(28, 47);
+    } else {
+        rrFillItem(30, 46);
+        rrFillItem(29, 47);
+    }
+    rSetDrawColor(127, 127, 127, 255);
+    rrFillItem(32, 42);
+}
+function baDrawRunners() {
 	rSetDrawColor(10, 10, 230, 250);
 	for (let i = 0; i < baRunners.length; ++i) {
 		rrFill(baRunners[i].x, baRunners[i].y);
@@ -317,6 +377,24 @@ function mCanMoveNorth(x, y) {
 }
 function mCanMoveSouth(x, y) {
 	return (mGetTileFlag(x, y - 1) & (mMOVE_NORTH_MASK | mMOVE_FULL_MASK)) === 0;
+}
+function mDrawGrid() {
+    for (var xTile = 0; xTile < mWidthTiles; ++xTile) {
+        if (xTile % 8 == 7) {
+            rSetDrawColor(0, 0, 0, 72);
+        } else {
+            rSetDrawColor(0, 0, 0, 48);
+        }
+		rrEastLineBig(xTile, 0, 64);
+    }
+    for (var yTile = 0; yTile < mHeightTiles; ++yTile) {
+        if (yTile % 8 == 7) {
+            rSetDrawColor(0, 0, 0, 72);
+        } else {
+            rSetDrawColor(0, 0, 0, 48);
+        }
+		rrNorthLineBig(0, yTile, 64);
+    }
 }
 function mDrawMap() {
 	rSetDrawColor(206, 183, 117, 255);
