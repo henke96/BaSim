@@ -3,18 +3,33 @@ const HTML_CANVAS_ID = "basimcanvas";
 
 function init() {
 	let canvas = document.getElementById(HTML_CANVAS_ID);
-	ruInit(5);
-	baInit();
-	mInit(mWAVE_1_TO_9, 64, 64);
-	rrInit(12);
 	rInit(canvas, 64*12, 64*12);
+	rrInit(12);
+	mInit(mWAVE_1_TO_9, 64, 64);
+	baInit();
+	ruInit(5);
+	canvas.onmousedown = onMouseDown;
+	canvas.oncontextmenu = function (e) {
+		e.preventDefault();
+	};
 	setInterval(mainLoop, 600);
 }
 
+function onMouseDown(e) {
+    var canvasRect = rCanvas.getBoundingClientRect();
+    let xTile = Math.trunc((e.clientX - canvasRect.left) / rrTileSize);
+    let yTile = Math.trunc((canvasRect.bottom - 1 - e.clientY) / rrTileSize);
+	if (e.button === 0) {
+		mAddItem(new fFood(xTile, yTile, true));
+	} else if (e.button === 2) {
+		mAddItem(new fFood(xTile, yTile, false));
+	}	
+}
 function mainLoop() {
 	baUpdate();
 	mDrawMap();
 	baDrawDetails();
+	mDrawItems();
 	baDrawRunners();
 	mDrawGrid();
 	baDrawOverlays();
@@ -25,6 +40,14 @@ function fFood(x, y, isGood) {
 	this.x = x;
 	this.y = y;
 	this.isGood = isGood;
+	if (this.isGood) {
+		this.colorRed = 0;
+		this.colorGreen = 255;
+	} else {
+		this.colorRed = 255;
+		this.colorGreen = 0;
+	}
+	this.colorBlue = 0;
 }
 //}
 //{ Runner - ru
@@ -55,7 +78,10 @@ ruRunner.prototype.tick = function() {
 			if (this.deathAnimCounter === 1) { // Counts as a kill here
 				//TODO
 			} else if (this.deathAnimCounter === 3) { // Breaks trap and drops eggs here
-				//TODO remove runner
+				let thisIndex = baRunners.indexOf(this);
+				if (thisIndex !== -1) {
+					baRunners.splice(thisIndex, 1);
+				}
 			}
 		}
 	} else {
@@ -126,10 +152,11 @@ ruRunner.prototype.tryTargetFood = function() {
 					firstFoodFound = food;
 				}
 				if (Math.max(Math.abs(this.x - food.x), Math.abs(this.y - food.y)) <= ruSniffDistance) {
-					this.targetFood = firstFoodFound;
+					this.foodTarget = firstFoodFound;
 					this.destinationX = firstFoodFound.x;
 					this.destinationY = firstFoodFound.y;
 					this.targetState = 0;
+					console.log("targeted food " + this.cycleTick);
 					return;
 				}
 			}
@@ -138,18 +165,20 @@ ruRunner.prototype.tryTargetFood = function() {
 }
 ruRunner.prototype.tryEatAndCheckTarget = function() {
 	if (this.foodTarget !== null) {
-		let itemZone = mGetItemZone(this.targetFood.x >>> 3, this.targetFood.y >>> 3);
-		let foodIndex = itemZone.indexOf(this.targetFood);
+		let itemZone = mGetItemZone(this.foodTarget.x >>> 3, this.foodTarget.y >>> 3);
+		let foodIndex = itemZone.indexOf(this.foodTarget);
 		if (foodIndex === -1) {
-			this.targetFood = null;
+			this.foodTarget = null;
 			this.targetState = 0;
 			return true;
-		} else if (this.x === this.targetFood.x && this.y === this.targetFood.y) {
-			if (this.targetFood.isGood) {
+		} else if (this.x === this.foodTarget.x && this.y === this.foodTarget.y) {
+			if (this.foodTarget.isGood) {
+				console.log("Ate good " + this.cycleTick);
 				if (baIsNearTrap(this.x, this.y)) {
 					this.isDying = true;
 				}
 			} else {
+				console.log("Ate bad " + this.cycleTick);
 				this.blughhhhCounter = 3;
 				this.targetState = 0;
 				if (this.cycleTick > 5) {
@@ -171,7 +200,7 @@ ruRunner.prototype.setDestinationBlughhhh = function() {
 	this.destinationX = this.x;
 	this.destinationY = baEAST_TRAP_Y + 4;
 }
-ruRunner.prototype.setDestinationRandomWalk = function() {
+ruRunner.prototype.setDestinationRandomWalk = function() { // TODO The thing where they always go towards a tile just north of exit when y is low enough.
 	let rnd = Math.floor(Math.random() * 6);
 	if (rnd < 4) {
 		this.destinationX = this.x;
@@ -187,7 +216,7 @@ ruRunner.prototype.setDestinationRandomWalk = function() {
 		this.destinationY = this.y;
 	}
 }
-ruRunner.prototype.doTick1 = function() {
+ruRunner.prototype.doTick1 = function() { // TODO is this the tick they check if they should raa to the south?
 	if (this.blughhhhCounter > 0) {
 		--this.blughhhhCounter;
 	} else {
@@ -256,7 +285,7 @@ const baWAVE10_RUNNER_SPAWN_X = 42;
 const baWAVE10_RUNNER_SPAWN_Y = 46;
 function baInit() {
 	baRunners = [];	
-	baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y));
+	baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y));	
 }
 function baUpdate() {
 	for (let i = 0; i < baRunners.length; ++i) {
@@ -321,7 +350,7 @@ function baDrawDetails() {
     rrFillItem(32, 42);
 }
 function baDrawRunners() {
-	rSetDrawColor(10, 10, 230, 250);
+	rSetDrawColor(10, 10, 230, 127);
 	for (let i = 0; i < baRunners.length; ++i) {
 		rrFill(baRunners[i].x, baRunners[i].y);
 	}
@@ -360,6 +389,9 @@ function mSetMap(map, widthTiles, heightTiles) {
 		}
 	}
 }
+function mAddItem(item) {
+	mGetItemZone(item.x >>> 3, item.y >>> 3).push(item);
+}
 function mGetItemZone(xZone, yZone) {
 	return mItemZones[xZone + mItemZonesWidth*yZone];
 }
@@ -395,6 +427,18 @@ function mDrawGrid() {
         }
 		rrNorthLineBig(0, yTile, 64);
     }
+}
+function mDrawItems() {
+	let endI = mItemZones.length;
+	for (let i = 0; i < endI; ++i) {
+		let itemZone = mItemZones[i];
+		let endJ = itemZone.length;
+		for (let j = 0; j < endJ; ++j) {
+			let item = itemZone[j];
+			rSetDrawColor(item.colorRed, item.colorGreen, item.colorBlue, 127);
+			rrFillItem(item.x, item.y);
+		}
+	}
 }
 function mDrawMap() {
 	rSetDrawColor(206, 183, 117, 255);
@@ -474,12 +518,12 @@ function mHasLineOfSight(x1, y1, x2, y2) {
         while (xTile !== x2) {
             xTile += xInc;
             let yTile = y >>> 16;
-            if ((getTileFlag(xTile, yTile) & xMask) !== 0) {
+            if ((mGetTileFlag(xTile, yTile) & xMask) !== 0) {
                 return false;
             }
             y += slope;
             let newYTile = y >>> 16;
-            if (newYTile !== yTile && (getTileFlag(xTile, newYTile) & yMask) !== 0) {
+            if (newYTile !== yTile && (mGetTileFlag(xTile, newYTile) & yMask) !== 0) {
                 return false;
             }
         }
@@ -510,12 +554,12 @@ function mHasLineOfSight(x1, y1, x2, y2) {
         while (yTile !== y2) {
             yTile += yInc;
             let xTile = x >>> 16;
-            if ((getTileFlag(xTile, yTile) & yMask) !== 0) {
+            if ((mGetTileFlag(xTile, yTile) & yMask) !== 0) {
                 return false;
             }
             x += slope;
             let newXTile = x >>> 16;
-            if (newXTile !== xTile && (getTileFlag(newXTile, yTile) & xMask) !== 0) {
+            if (newXTile !== xTile && (mGetTileFlag(newXTile, yTile) & xMask) !== 0) {
                 return false;
             }
         }
