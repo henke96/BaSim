@@ -68,9 +68,9 @@ function ruRunner(x, y) {
 	this.cycleTick = 0;
 	this.targetState = -1;
 	this.foodTarget = null;
-	this.blughhhhCounter = 0;
+	this.blughhhhCountdown = 0;
 	this.standStillCounter = 0;
-	this.deathAnimCounter = 0;
+	this.despawnCountdown = -1;
 	this.isDying = false;
 }
 ruRunner.prototype.tick = function() {
@@ -78,41 +78,46 @@ ruRunner.prototype.tick = function() {
 		this.cycleTick = 1;
 	}
 	++this.standStillCounter;
-	if (this.isDying) {
-		if (this.standStillCounter > 2) {
-			++this.deathAnimCounter;
-			if (this.deathAnimCounter === 1) { // Counts as a kill here
-				//TODO
-			} else if (this.deathAnimCounter === 3) { // Breaks trap and drops eggs here
-				baRunnersToRemove.push(this);
-			}
+	if (this.despawnCountdown !== -1) {
+		if (--this.despawnCountdown === 0) {
+			baRunnersToRemove.push(this);
+			console.log("Despawn " + this.cycleTick);
 		}
 	} else {
-		switch(this.cycleTick) {
-		case 1:
-			this.doTick1();
-			break;
-		case 2:
-			this.doTick2Or5();
-			break;
-		case 3:
-			this.doTick3();
-			break;
-		case 4:
-			this.doTick4();
-			break;
-		case 5:
-			this.doTick2Or5();
-			break;
-		case 6:
-			this.doTick6();
-			break;
-		case 7:
-		case 8:
-		case 9:
-		case 10:
-			this.doTick7To10();
-			break;
+		if (!this.isDying) {
+			switch(this.cycleTick) {
+			case 1:
+				this.doTick1();
+				break;
+			case 2:
+				this.doTick2Or5();
+				break;
+			case 3:
+				this.doTick3();
+				break;
+			case 4:
+				this.doTick4();
+				break;
+			case 5:
+				this.doTick2Or5();
+				break;
+			case 6:
+				this.doTick6();
+				break;
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+				this.doTick7To10();
+				break;
+			}
+		}
+		if (this.isDying) {
+			if (this.standStillCounter > 2) {
+				// Counts as kill here
+				console.log("Urghhh! " + this.cycleTick);
+				this.despawnCountdown = 2;
+			}
 		}
 	}
 }
@@ -182,7 +187,7 @@ ruRunner.prototype.tryEatAndCheckTarget = function() {
 				}
 			} else {
 				console.log("Ate bad " + this.cycleTick);
-				this.blughhhhCounter = 3;
+				this.blughhhhCountdown = 3;
 				this.targetState = 0;
 				if (this.cycleTick > 5) {
 					this.cycleTick -= 5;
@@ -203,25 +208,56 @@ ruRunner.prototype.setDestinationBlughhhh = function() {
 	this.destinationX = this.x;
 	this.destinationY = baEAST_TRAP_Y + 4;
 }
-ruRunner.prototype.setDestinationRandomWalk = function() { // TODO The thing where they always go towards a tile just north of exit when y is low enough.
+ruRunner.prototype.setDestinationRandomWalk = function() {
+	// Hardcoded areas/destinations to the south
+	if (this.x <= 27) {
+		if (this.y === 16 || this.y === 17) {	
+			this.destinationX = 30;
+			this.destinationY = 16;
+			return;
+		} else if (this.x === 25 && this.y === 15) {
+			this.destinationX = 26;
+			this.destinationY = 16;
+			return;
+		}
+	} else if (this.x <= 32) {
+		if (this.y <= 16) {
+			this.destinationX = 30;
+			this.destinationY = 14;
+			return;
+		}
+	} else if (this.y === 15 || this.y === 16){
+		this.destinationX = 31;
+		this.destinationY = 16;
+		return;
+	}
+	// Normal random walk
 	let rnd = Math.floor(Math.random() * 6);
 	if (rnd < 4) {
 		this.destinationX = this.x;
 		this.destinationY = this.y - 5;
 	} else if (rnd === 4) {
 		this.destinationX = this.x - 5;
+		if (this.destinationX < baWEST_TRAP_X - 1) {
+			this.destinationX = baWEST_TRAP_X - 1;
+		}
 		this.destinationY = this.y;
 	} else {
 		this.destinationX = this.x + 5;
-		if (this.destinationX > baEAST_TRAP_X) { // TODO is this how it works?
+		if (this.destinationX > baEAST_TRAP_X) {
 			this.destinationX = baEAST_TRAP_X;
 		}
 		this.destinationY = this.y;
 	}
 }
 ruRunner.prototype.doTick1 = function() { // TODO is this the tick they check if they should raa to the south?
-	if (this.blughhhhCounter > 0) {
-		--this.blughhhhCounter;
+	if (this.y === 14) {
+		this.despawnCountdown = 3;
+		console.log("Raa!" + this.cycleTick);
+		return;
+	}
+	if (this.blughhhhCountdown > 0) {
+		--this.blughhhhCountdown;
 	} else {
 		++this.targetState;
 		if (this.targetState > 3) {
@@ -229,7 +265,7 @@ ruRunner.prototype.doTick1 = function() { // TODO is this the tick they check if
 		}
 	}
 	let ateOrTargetGone = this.tryEatAndCheckTarget();
-	if (this.blughhhhCounter === 0 && this.foodTarget === null) { // Could make this line same as tick 6 without any difference?
+	if (this.blughhhhCountdown === 0 && this.foodTarget === null) { // Could make this line same as tick 6 without any difference?
 		this.cancelDestination();
 	}
 	if (!ateOrTargetGone) {
@@ -255,14 +291,19 @@ ruRunner.prototype.doTick4 = function() {
 	this.doTick7To10();
 }
 ruRunner.prototype.doTick6 = function() {
-	if (this.blughhhhCounter > 0) {
-		--this.blughhhhCounter;
+	if (this.y === 14) {
+		this.despawnCountdown = 3;
+		console.log("Raa!" + this.cycleTick);
+		return;
+	}
+	if (this.blughhhhCountdown > 0) {
+		--this.blughhhhCountdown;
 	}
 	if (this.targetState === 3) {
 		this.tryTargetFood();
 	}
 	let ateOrTargetGone = this.tryEatAndCheckTarget();
-	if (this.blughhhhCounter === 0 && (this.foodTarget === null || ateOrTargetGone)) {
+	if (this.blughhhhCountdown === 0 && (this.foodTarget === null || ateOrTargetGone)) {
 		this.setDestinationRandomWalk();
 	}
 	if (!ateOrTargetGone) {
