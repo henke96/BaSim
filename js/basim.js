@@ -181,12 +181,12 @@ ruRunner.prototype.tryEatAndCheckTarget = function() {
 			return true;
 		} else if (this.x === this.foodTarget.x && this.y === this.foodTarget.y) {
 			if (this.foodTarget.isGood) {
-				console.log("Ate good " + this.cycleTick);
+				console.log("Chomp, chomp. (good) " + this.cycleTick);
 				if (baIsNearTrap(this.x, this.y)) {
 					this.isDying = true;
 				}
 			} else {
-				console.log("Ate bad " + this.cycleTick);
+				console.log("Chomp, chomp. (bad) " + this.cycleTick);
 				this.blughhhhCountdown = 3;
 				this.targetState = 0;
 				if (this.cycleTick > 5) {
@@ -250,7 +250,7 @@ ruRunner.prototype.setDestinationRandomWalk = function() {
 		this.destinationY = this.y;
 	}
 }
-ruRunner.prototype.doTick1 = function() { // TODO is this the tick they check if they should raa to the south?
+ruRunner.prototype.doTick1 = function() {
 	if (this.y === 14) {
 		this.despawnCountdown = 3;
 		console.log("Raa!" + this.cycleTick);
