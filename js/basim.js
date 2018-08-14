@@ -124,20 +124,20 @@ ruRunner.prototype.tick = function() {
 ruRunner.prototype.doMovement = function() {
 	let startX = this.x;
 	if (this.destinationX > startX) {
-		if (mCanMoveEast(startX, this.y)) {
+		if (!baTileBlocksPenance(startX + 1, this.y) && mCanMoveEast(startX, this.y)) {
 			++this.x;
 			this.standStillCounter = 0;
 		}
-	} else if (this.destinationX < startX && mCanMoveWest(startX, this.y)) {
+	} else if (this.destinationX < startX && !baTileBlocksPenance(startX - 1, this.y) && mCanMoveWest(startX, this.y)) {
 		--this.x;
 		this.standStillCounter = 0;
 	}
 	if (this.destinationY > this.y) {
-		if (mCanMoveNorth(startX, this.y) && mCanMoveNorth(this.x, this.y)) {
+		if (!baTileBlocksPenance(startX, this.y + 1) && mCanMoveNorth(startX, this.y) && mCanMoveNorth(this.x, this.y)) {
 			++this.y;
 			this.standStillCounter = 0;
 		}
-	} else if (this.destinationY < this.y && mCanMoveSouth(startX, this.y) && mCanMoveSouth(this.x, this.y)) {
+	} else if (this.destinationY < this.y && !baTileBlocksPenance(startX, this.y - 1) && mCanMoveSouth(startX, this.y) && mCanMoveSouth(this.x, this.y)) {
 		--this.y;
 		this.standStillCounter = 0;
 	}
@@ -408,6 +408,21 @@ function baDrawRunners() {
 }
 function baIsNearTrap(x, y) {
 	return (Math.abs(x - baEAST_TRAP_X) < 2 && Math.abs(y - baEAST_TRAP_Y) < 2) || (Math.abs(x - baWEST_TRAP_X) < 2 && Math.abs(y - baWEST_TRAP_Y) < 2);
+}
+function baTileBlocksPenance(x, y) {
+	if (y === 30) {
+		if (x >= 20 && x <= 22) {
+			return true;
+		}
+		if (mCurrentMap === mWAVE_1_TO_9 && x >= 39 && x <= 41) {
+			return true;
+		}
+	} else if (x === 46 && y >= 17 && y <= 20) {
+		return true;
+	} else if (mCurrentMap === mWAVE_1_TO_9 && x === 27 && y === 32) {
+		return true;
+	}
+	return false;
 }
 var baRunners;
 var baRunnersToRemove;
