@@ -18,9 +18,9 @@ function init() {
 }
 
 function onMouseDown(e) {
-    var canvasRect = rCanvas.getBoundingClientRect();
-    let xTile = Math.trunc((e.clientX - canvasRect.left) / rrTileSize);
-    let yTile = Math.trunc((canvasRect.bottom - 1 - e.clientY) / rrTileSize);
+	var canvasRect = rCanvas.getBoundingClientRect();
+	let xTile = Math.trunc((e.clientX - canvasRect.left) / rrTileSize);
+	let yTile = Math.trunc((canvasRect.bottom - 1 - e.clientY) / rrTileSize);
 	if (e.button === 0) {
 		mAddItem(new fFood(xTile, yTile, true));
 	} else if (e.button === 2) {
@@ -164,7 +164,7 @@ ruRunner.prototype.tryTargetFood = function() {
 					this.destinationX = firstFoodFound.x;
 					this.destinationY = firstFoodFound.y;
 					this.targetState = 0;
-					console.log("targeted food " + this.cycleTick);
+					console.log("Targeted food " + this.cycleTick);
 					return;
 				}
 			}
@@ -181,12 +181,12 @@ ruRunner.prototype.tryEatAndCheckTarget = function() {
 			return true;
 		} else if (this.x === this.foodTarget.x && this.y === this.foodTarget.y) {
 			if (this.foodTarget.isGood) {
-				console.log("Chomp, chomp. (good) " + this.cycleTick);
+				console.log("Chomp, chomp. " + this.cycleTick);
 				if (baIsNearTrap(this.x, this.y)) {
 					this.isDying = true;
 				}
 			} else {
-				console.log("Chomp, chomp. (bad) " + this.cycleTick);
+				console.log("Blughhhh. " + this.cycleTick);
 				this.blughhhhCountdown = 3;
 				this.targetState = 0;
 				if (this.cycleTick > 5) {
@@ -253,7 +253,7 @@ ruRunner.prototype.setDestinationRandomWalk = function() {
 ruRunner.prototype.doTick1 = function() {
 	if (this.y === 14) {
 		this.despawnCountdown = 3;
-		console.log("Raa!" + this.cycleTick);
+		console.log("Raaa!" + this.cycleTick);
 		return;
 	}
 	if (this.blughhhhCountdown > 0) {
@@ -344,61 +344,61 @@ function baUpdate() {
 	}
 }
 function baDrawOverlays() { 
-    if (mCurrentMap !== mWAVE_1_TO_9 && mCurrentMap !== mWAVE10) {
-        return;
-    }
-    rSetDrawColor(160, 82, 45, 255);
-    rrOutline(45, 34);
-    rrOutline(15, 33);
-    rSetDrawColor(255, 0, 0, 255);
-    if (mCurrentMap === mWAVE_1_TO_9) {
-        rrOutline(18, 45);
-    } else {
-        rrOutline(18, 46);
-    }
-    rrOutline(24, 47);
-    rSetDrawColor(0, 0, 255, 255);
-    if (mCurrentMap === mWAVE_1_TO_9) {
-        rrOutline(36, 47);
-    } else {
-        rrOutline(42, 46);
-    }
-    rSetDrawColor(0, 255, 0, 255);
-    if (mCurrentMap === mWAVE_1_TO_9) {
-        rrOutline(42, 45);
-    } else {
-        rrOutline(36, 47);
-    }
+	if (mCurrentMap !== mWAVE_1_TO_9 && mCurrentMap !== mWAVE10) {
+		return;
+	}
+	rSetDrawColor(160, 82, 45, 255);
+	rrOutline(45, 34);
+	rrOutline(15, 33);
+	rSetDrawColor(255, 0, 0, 255);
+	if (mCurrentMap === mWAVE_1_TO_9) {
+		rrOutline(18, 45);
+	} else {
+		rrOutline(18, 46);
+	}
+	rrOutline(24, 47);
+	rSetDrawColor(0, 0, 255, 255);
+	if (mCurrentMap === mWAVE_1_TO_9) {
+		rrOutline(36, 47);
+	} else {
+		rrOutline(42, 46);
+	}
+	rSetDrawColor(0, 255, 0, 255);
+	if (mCurrentMap === mWAVE_1_TO_9) {
+		rrOutline(42, 45);
+	} else {
+		rrOutline(36, 47);
+	}
 }
 function baDrawDetails() {
-    if (mCurrentMap !== mWAVE_1_TO_9 && currentMap !== mWAVE10) {
-        return;
-    }
-    rSetDrawColor(160, 82, 45, 255);
-    rrCone(40, 40);
-    rrCone(40, 39);
-    rrCone(41, 40);
-    rrCone(41, 39);
-    rrCone(43, 39);
-    rrCone(36, 42);
-    rrCone(36, 43);
-    rrCone(37, 42);
-    rrCone(37, 43);
-    rrCone(39, 44);
-    rrCone(43, 30);
-    rrCone(43, 31);
-    rrCone(44, 30);
-    rrCone(44, 31);
-    rrCone(45, 32);
-    if (mCurrentMap === mWAVE_1_TO_9) {
-        rrFillItem(29, 46);
-        rrFillItem(28, 47);
-    } else {
-        rrFillItem(30, 46);
-        rrFillItem(29, 47);
-    }
-    rSetDrawColor(127, 127, 127, 255);
-    rrFillItem(32, 42);
+	if (mCurrentMap !== mWAVE_1_TO_9 && currentMap !== mWAVE10) {
+		return;
+	}
+	rSetDrawColor(160, 82, 45, 255);
+	rrCone(40, 40);
+	rrCone(40, 39);
+	rrCone(41, 40);
+	rrCone(41, 39);
+	rrCone(43, 39);
+	rrCone(36, 42);
+	rrCone(36, 43);
+	rrCone(37, 42);
+	rrCone(37, 43);
+	rrCone(39, 44);
+	rrCone(43, 30);
+	rrCone(43, 31);
+	rrCone(44, 30);
+	rrCone(44, 31);
+	rrCone(45, 32);
+	if (mCurrentMap === mWAVE_1_TO_9) {
+		rrFillItem(29, 46);
+		rrFillItem(28, 47);
+	} else {
+		rrFillItem(30, 46);
+		rrFillItem(29, 47);
+	}
+	rSetDrawColor(127, 127, 127, 255);
+	rrFillItem(32, 42);
 }
 function baDrawRunners() {
 	rSetDrawColor(10, 10, 230, 127);
@@ -463,22 +463,22 @@ function mCanMoveSouth(x, y) {
 	return (mGetTileFlag(x, y - 1) & (mMOVE_NORTH_MASK | mMOVE_FULL_MASK)) === 0;
 }
 function mDrawGrid() {
-    for (var xTile = 0; xTile < mWidthTiles; ++xTile) {
-        if (xTile % 8 == 7) {
-            rSetDrawColor(0, 0, 0, 72);
-        } else {
-            rSetDrawColor(0, 0, 0, 48);
-        }
+	for (var xTile = 0; xTile < mWidthTiles; ++xTile) {
+		if (xTile % 8 == 7) {
+			rSetDrawColor(0, 0, 0, 72);
+		} else {
+			rSetDrawColor(0, 0, 0, 48);
+		}
 		rrEastLineBig(xTile, 0, 64);
-    }
-    for (var yTile = 0; yTile < mHeightTiles; ++yTile) {
-        if (yTile % 8 == 7) {
-            rSetDrawColor(0, 0, 0, 72);
-        } else {
-            rSetDrawColor(0, 0, 0, 48);
-        }
+	}
+	for (var yTile = 0; yTile < mHeightTiles; ++yTile) {
+		if (yTile % 8 == 7) {
+			rSetDrawColor(0, 0, 0, 72);
+		} else {
+			rSetDrawColor(0, 0, 0, 48);
+		}
 		rrNorthLineBig(0, yTile, 64);
-    }
+	}
 }
 function mDrawItems() {
 	let endI = mItemZones.length;
@@ -494,129 +494,129 @@ function mDrawItems() {
 }
 function mDrawMap() {
 	rSetDrawColor(206, 183, 117, 255);
-    rClear();
-    for (let y = 0; y < 64; ++y) {	
-        for (let x = 0; x < 64; ++x) {
+	rClear();
+	for (let y = 0; y < 64; ++y) {	
+		for (let x = 0; x < 64; ++x) {
 			let tileFlag = mGetTileFlag(x, y);
-            if ((tileFlag & mLOS_FULL_MASK) !== 0) {
-                rSetDrawColor(0, 0, 0, 255);
-                rrFillOpaque(x, y);
-            } else  {
-                if ((tileFlag & mMOVE_FULL_MASK) !== 0) {
-                    rSetDrawColor(127, 127, 127, 255);
-                    rrFillOpaque(x, y);
-                }
-                if ((tileFlag & mLOS_EAST_MASK) !== 0) {
-                    rSetDrawColor(0, 0, 0, 255);
-                    rrEastLine(x, y);
-                } else if ((tileFlag & mMOVE_EAST_MASK) !== 0) {
-                    rSetDrawColor(127, 127, 127, 255);
-                    rrEastLine(x, y);
-                }
-                if ((tileFlag & mLOS_WEST_MASK) !== 0) {
-                    rSetDrawColor(0, 0, 0, 255);
-                    rrWestLine(x, y);
-                } else if ((tileFlag & mMOVE_WEST_MASK) !== 0) {
-                    rSetDrawColor(127, 127, 127, 255);
-                    rrWestLine(x, y);
-                }
-                if ((tileFlag & mLOS_NORTH_MASK) !== 0) {
-                    rSetDrawColor(0, 0, 0, 255);
-                    rrNorthLine(x, y);
-                } else if ((tileFlag & mMOVE_NORTH_MASK) !== 0) {
-                    rSetDrawColor(127, 127, 127, 255);
-                    rrNorthLine(x, y);
-                }
-                if ((tileFlag & mLOS_SOUTH_MASK) !== 0) {
-                    rSetDrawColor(0, 0, 0, 255);
-                    rrSouthLine(x, y);
-                } else if ((tileFlag & mMOVE_SOUTH_MASK) !== 0) {
-                    rSetDrawColor(127, 127, 127, 255);
-                    rrSouthLine(x, y);
-                }
-            }
-        }
-    }
+			if ((tileFlag & mLOS_FULL_MASK) !== 0) {
+				rSetDrawColor(0, 0, 0, 255);
+				rrFillOpaque(x, y);
+			} else  {
+				if ((tileFlag & mMOVE_FULL_MASK) !== 0) {
+					rSetDrawColor(127, 127, 127, 255);
+					rrFillOpaque(x, y);
+				}
+				if ((tileFlag & mLOS_EAST_MASK) !== 0) {
+					rSetDrawColor(0, 0, 0, 255);
+					rrEastLine(x, y);
+				} else if ((tileFlag & mMOVE_EAST_MASK) !== 0) {
+					rSetDrawColor(127, 127, 127, 255);
+					rrEastLine(x, y);
+				}
+				if ((tileFlag & mLOS_WEST_MASK) !== 0) {
+					rSetDrawColor(0, 0, 0, 255);
+					rrWestLine(x, y);
+				} else if ((tileFlag & mMOVE_WEST_MASK) !== 0) {
+					rSetDrawColor(127, 127, 127, 255);
+					rrWestLine(x, y);
+				}
+				if ((tileFlag & mLOS_NORTH_MASK) !== 0) {
+					rSetDrawColor(0, 0, 0, 255);
+					rrNorthLine(x, y);
+				} else if ((tileFlag & mMOVE_NORTH_MASK) !== 0) {
+					rSetDrawColor(127, 127, 127, 255);
+					rrNorthLine(x, y);
+				}
+				if ((tileFlag & mLOS_SOUTH_MASK) !== 0) {
+					rSetDrawColor(0, 0, 0, 255);
+					rrSouthLine(x, y);
+				} else if ((tileFlag & mMOVE_SOUTH_MASK) !== 0) {
+					rSetDrawColor(127, 127, 127, 255);
+					rrSouthLine(x, y);
+				}
+			}
+		}
+	}
 }
 function mHasLineOfSight(x1, y1, x2, y2) {
-    let dx = x2 - x1;
-    let dxAbs = Math.abs(dx);
-    let dy = y2 - y1;
-    let dyAbs = Math.abs(dy);
-    
-    if (dxAbs > dyAbs) {
-        let xTile = x1;
-        let y = y1 << 16;
-        let slope = Math.trunc((dy << 16) / dxAbs); // Integer division
-        
-        let xInc;
-        let xMask;
-        if (dx > 0) {
-            xInc = 1;
-            xMask = mLOS_WEST_MASK | mLOS_FULL_MASK;
-        } else {
-            xInc = -1;
-            xMask = mLOS_EAST_MASK | mLOS_FULL_MASK;
-        }
-        let yMask;
-        y += 0x8000;
-        if (dy < 0) {
-            y -= 1; // For correct rounding
-            yMask = mLOS_NORTH_MASK | mLOS_FULL_MASK;
-        } else {
-            yMask = mLOS_SOUTH_MASK | mLOS_FULL_MASK;
-        }
-        
-        while (xTile !== x2) {
-            xTile += xInc;
-            let yTile = y >>> 16;
-            if ((mGetTileFlag(xTile, yTile) & xMask) !== 0) {
-                return false;
-            }
-            y += slope;
-            let newYTile = y >>> 16;
-            if (newYTile !== yTile && (mGetTileFlag(xTile, newYTile) & yMask) !== 0) {
-                return false;
-            }
-        }
-    } else {
-        let yTile = y1;
-        let x = x1 << 16;
-        let slope = Math.trunc((dx << 16) / dyAbs); // Integer division
-        
-        let yInc;
-        let yMask;
-        if (dy > 0) {
-            yInc = 1;
-            yMask = mLOS_SOUTH_MASK | mLOS_FULL_MASK;
-        } else {
-            yInc = -1;
-            yMask = mLOS_NORTH_MASK | mLOS_FULL_MASK;
-        }
-        
-        let xMask;
-        x += 0x8000;
-        if (dx < 0) {
-            x -= 1; // For correct rounding
-            xMask = mLOS_EAST_MASK | mLOS_FULL_MASK;
-        } else {
-            xMask = mLOS_WEST_MASK | mLOS_FULL_MASK;
-        }
-        
-        while (yTile !== y2) {
-            yTile += yInc;
-            let xTile = x >>> 16;
-            if ((mGetTileFlag(xTile, yTile) & yMask) !== 0) {
-                return false;
-            }
-            x += slope;
-            let newXTile = x >>> 16;
-            if (newXTile !== xTile && (mGetTileFlag(newXTile, yTile) & xMask) !== 0) {
-                return false;
-            }
-        }
-    }
-    return true;
+	let dx = x2 - x1;
+	let dxAbs = Math.abs(dx);
+	let dy = y2 - y1;
+	let dyAbs = Math.abs(dy);
+	
+	if (dxAbs > dyAbs) {
+		let xTile = x1;
+		let y = y1 << 16;
+		let slope = Math.trunc((dy << 16) / dxAbs); // Integer division
+		
+		let xInc;
+		let xMask;
+		if (dx > 0) {
+			xInc = 1;
+			xMask = mLOS_WEST_MASK | mLOS_FULL_MASK;
+		} else {
+			xInc = -1;
+			xMask = mLOS_EAST_MASK | mLOS_FULL_MASK;
+		}
+		let yMask;
+		y += 0x8000;
+		if (dy < 0) {
+			y -= 1; // For correct rounding
+			yMask = mLOS_NORTH_MASK | mLOS_FULL_MASK;
+		} else {
+			yMask = mLOS_SOUTH_MASK | mLOS_FULL_MASK;
+		}
+		
+		while (xTile !== x2) {
+			xTile += xInc;
+			let yTile = y >>> 16;
+			if ((mGetTileFlag(xTile, yTile) & xMask) !== 0) {
+				return false;
+			}
+			y += slope;
+			let newYTile = y >>> 16;
+			if (newYTile !== yTile && (mGetTileFlag(xTile, newYTile) & yMask) !== 0) {
+				return false;
+			}
+		}
+	} else {
+		let yTile = y1;
+		let x = x1 << 16;
+		let slope = Math.trunc((dx << 16) / dyAbs); // Integer division
+		
+		let yInc;
+		let yMask;
+		if (dy > 0) {
+			yInc = 1;
+			yMask = mLOS_SOUTH_MASK | mLOS_FULL_MASK;
+		} else {
+			yInc = -1;
+			yMask = mLOS_NORTH_MASK | mLOS_FULL_MASK;
+		}
+		
+		let xMask;
+		x += 0x8000;
+		if (dx < 0) {
+			x -= 1; // For correct rounding
+			xMask = mLOS_EAST_MASK | mLOS_FULL_MASK;
+		} else {
+			xMask = mLOS_WEST_MASK | mLOS_FULL_MASK;
+		}
+		
+		while (yTile !== y2) {
+			yTile += yInc;
+			let xTile = x >>> 16;
+			if ((mGetTileFlag(xTile, yTile) & yMask) !== 0) {
+				return false;
+			}
+			x += slope;
+			let newXTile = x >>> 16;
+			if (newXTile !== xTile && (mGetTileFlag(newXTile, yTile) & xMask) !== 0) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
 var mCurrentMap;
 var mWidthTiles;
