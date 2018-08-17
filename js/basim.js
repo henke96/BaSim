@@ -184,6 +184,7 @@ function plPathfind(destX, destY) {
 			}
 		}
 		if (!foundDestination) {
+			plPathQueuePos = 0;
 			return;
 		}
 	}
