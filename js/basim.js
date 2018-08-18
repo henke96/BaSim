@@ -193,7 +193,6 @@ function plPathfind(destX, destY) {
 		let waypoint = plWayPoints[currentX + currentY*mWidthTiles];
 		plPathQueueX[plPathQueuePos] = currentX;
 		plPathQueueY[plPathQueuePos++] = currentY;
-		console.log(currentX + ", " + currentY);
 		if ((waypoint & 2) !== 0) {
 			++currentX;
 		} else if ((waypoint & 8) !== 0) {
@@ -204,9 +203,6 @@ function plPathfind(destX, destY) {
 		} else if ((waypoint & 4) !== 0) {
 			--currentY;
 		}
-	}
-	for (let i = plPathQueuePos - 1; i >= 0; --i) {
-		console.log(plPathQueueX[i] + ", " + plPathQueueY[i]);
 	}
 }
 var plPathQueuePos;
