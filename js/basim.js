@@ -236,11 +236,42 @@ function fFood(x, y, isGood) {
 	this.colorBlue = 0;
 }
 //}
+//{ RunnerRNG - rng
+const rngSOUTH = 0;
+const rngWEST = 1;
+const rngEAST = 2;
+function rngRunnerRNG(forcedMovements) {
+	this.forcedMovements = forcedMovements;
+	this.forcedMovementsIndex = 0;
+}
+rngRunnerRNG.prototype.rollMovement = function() {
+	if (this.forcedMovements.length > this.forcedMovementsIndex) {
+		let movement = this.forcedMovements.charAt(this.forcedMovementsIndex++);
+		if (movement === "s") {
+			return rngSOUTH;
+		}
+		if (movement === "w") {
+			return rngWEST;
+		}
+		if (movement === "e") {
+			return rngEAST;
+		}
+	}
+	let rnd = Math.floor(Math.random() * 6);
+	if (rnd < 4) {
+		return rngSOUTH;
+	}
+	if (rnd === 4) {
+		return rngWEST;
+	}
+	return rngEAST;
+}
+//}
 //{ Runner - ru
 function ruInit(sniffDistance) {
 	ruSniffDistance = sniffDistance;
 }
-function ruRunner(x, y) {
+function ruRunner(x, y, runnerRNG) {
 	this.x = x;
 	this.y = y;
 	this.destinationX = x;
@@ -252,6 +283,7 @@ function ruRunner(x, y) {
 	this.standStillCounter = 0;
 	this.despawnCountdown = -1;
 	this.isDying = false;
+	this.runnerRNG = runnerRNG;
 }
 ruRunner.prototype.tick = function() {
 	if (++this.cycleTick > 10) {
@@ -393,7 +425,6 @@ ruRunner.prototype.setDestinationBlughhhh = function() {
 	this.destinationY = baEAST_TRAP_Y + 4;
 }
 ruRunner.prototype.setDestinationRandomWalk = function() {
-	// Hardcoded areas/destinations to the south
 	if (this.x <= 27) {
 		if (this.y === 16 || this.y === 17) {	
 			this.destinationX = 30;
@@ -415,12 +446,11 @@ ruRunner.prototype.setDestinationRandomWalk = function() {
 		this.destinationY = 16;
 		return;
 	}
-	// Normal random walk
-	let rnd = Math.floor(Math.random() * 6);
-	if (rnd < 4) {
+	let direction = this.runnerRNG.rollMovement();
+	if (direction === rngSOUTH) {
 		this.destinationX = this.x;
 		this.destinationY = this.y - 5;
-	} else if (rnd === 4) {
+	} else if (direction === rngWEST) {
 		this.destinationX = this.x - 5;
 		if (this.destinationX < baWEST_TRAP_X - 1) {
 			this.destinationX = baWEST_TRAP_X - 1;
@@ -538,9 +568,9 @@ function baUpdate() {
 	}
 	if (baTickCounter > 1 && baTickCounter % 10 === 1 && baRunnersAlive < baMaxRunnersAlive && baRunnersKilled + baRunnersAlive < baTotalRunners) {
 		if (mCurrentMap === mWAVE_1_TO_9) {
-			baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y));
+			baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y, new rngRunnerRNG("")));
 		} else {
-			baRunners.push(new ruRunner(baWAVE10_RUNNER_SPAWN_X, baWAVE10_RUNNER_SPAWN_Y));
+			baRunners.push(new ruRunner(baWAVE10_RUNNER_SPAWN_X, baWAVE10_RUNNER_SPAWN_Y, new rngRunnerRNG("")));
 		}
 		++baRunnersAlive;
 	}
