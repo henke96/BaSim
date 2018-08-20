@@ -368,11 +368,11 @@ ruRunner.prototype.doMovement = function() { // TODO: Doesn't consider diagonal 
 		this.standStillCounter = 0;
 	}
 	if (this.destinationY > this.y) {
-		if (!baTileBlocksPenance(startX, this.y + 1) && mCanMoveNorth(startX, this.y) && mCanMoveNorth(this.x, this.y)) {
+		if (!baTileBlocksPenance(startX, this.y + 1) && !baTileBlocksPenance(this.x, this.y + 1) && mCanMoveNorth(startX, this.y) && mCanMoveNorth(this.x, this.y)) {
 			++this.y;
 			this.standStillCounter = 0;
 		}
-	} else if (this.destinationY < this.y && !baTileBlocksPenance(startX, this.y - 1) && mCanMoveSouth(startX, this.y) && mCanMoveSouth(this.x, this.y)) {
+	} else if (this.destinationY < this.y && !baTileBlocksPenance(startX, this.y - 1) && !baTileBlocksPenance(this.x, this.y - 1) && mCanMoveSouth(startX, this.y) && mCanMoveSouth(this.x, this.y)) {
 		--this.y;
 		this.standStillCounter = 0;
 	}
