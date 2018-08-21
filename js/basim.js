@@ -862,9 +862,6 @@ const mMOVE_WEST_MASK = 0x80;
 const mMOVE_NORTH_MASK = 0x2;
 const mMOVE_SOUTH_MASK = 0x20;
 function mInit(map, widthTiles, heightTiles) {
-	mSetMap(map, widthTiles, heightTiles);
-}
-function mSetMap(map, widthTiles, heightTiles) {
 	mCurrentMap = map;
 	mWidthTiles = widthTiles;
 	mHeightTiles = heightTiles;
