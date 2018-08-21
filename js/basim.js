@@ -23,6 +23,9 @@ function simInit() {
 	ruInit(5);
 	simReset();
 	window.onkeydown = simWindowOnKeyDown;
+	window.onkeyup = function (e) {
+		simMovementsInput.value = simMovementsInput.value.trim();
+	};
 	canvas.onmousedown = simCanvasOnMouseDown;
 	canvas.oncontextmenu = function (e) {
 		e.preventDefault();
@@ -104,7 +107,7 @@ function simStartStopButtonOnClick() {
 	}
 }
 function simParseMovementsInput() {
-	let movements = simMovementsInput.value.split("-");
+	let movements = simMovementsInput.value.trim().split("-");
 	for (let i = 0; i < movements.length; ++i) {
 		let moves = movements[i];
 		for (let j = 0; j < moves.length; ++j) {
