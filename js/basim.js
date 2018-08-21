@@ -10,6 +10,11 @@ window.onload = simInit;
 function simInit() {
 	let canvas = document.getElementById(HTML_CANVAS);
 	simMovementsInput = document.getElementById(HTML_RUNNER_MOVEMENTS);
+	simMovementsInput.onkeypress = function (e) {
+		if (e.key !== "e" && e.key !== "w" && e.key !== "s" && e.key !== "-") {
+			e.preventDefault();
+		}
+	};
 	simStartStopButton = document.getElementById(HTML_START_BUTTON);
 	simStartStopButton.onclick = simStartStopButtonOnClick;
 	simWaveSelect = document.getElementById(HTML_WAVE_SELECT);
@@ -23,11 +28,6 @@ function simInit() {
 	ruInit(5);
 	simReset();
 	window.onkeydown = simWindowOnKeyDown;
-	simMovementsInput.onkeypress = function (e) {
-		if (e.key === " ") {
-			e.preventDefault();
-		}
-	};
 	canvas.onmousedown = simCanvasOnMouseDown;
 	canvas.oncontextmenu = function (e) {
 		e.preventDefault();
