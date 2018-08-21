@@ -124,7 +124,7 @@ function simWindowOnKeyDown(e) {
 			mAddItem(new fFood(plX, plY, false));
 		}
 	}
-	if (e.key === "s") {
+	if (e.key === " ") {
 		simStartStopButtonOnClick();
 	}
 }
