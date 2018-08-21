@@ -172,7 +172,7 @@ function simDefLevelSelectOnChange(e) {
 }
 function simTick() {
 	baTick();
-	plUpdate();
+	plTick();
 	simDraw();
 }
 function simDraw() {
@@ -203,7 +203,7 @@ function plInit(x, y) {
 	plShortestDistances = [];
 	plWayPoints = [];
 }
-function plUpdate() {
+function plTick() {
 	if (plPathQueuePos > 0) {
 		plX = plPathQueueX[--plPathQueuePos];
 		plY = plPathQueueY[plPathQueuePos];
