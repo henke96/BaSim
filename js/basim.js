@@ -414,7 +414,7 @@ ruRunner.prototype.tick = function() {
 			if (!this.isDying) {
 				--baRunnersAlive;
 			}
-			console.log("Despawn " + this.cycleTick);
+			console.log(baTickCounter + ": Despawn " + this.cycleTick);
 		}
 	} else {
 		if (!this.isDying) {
@@ -449,7 +449,7 @@ ruRunner.prototype.tick = function() {
 			if (this.standStillCounter > 2) {
 				++baRunnersKilled;
 				--baRunnersAlive;
-				console.log("Urghhh! " + this.cycleTick);
+				console.log(baTickCounter + ": Urghhh! " + this.cycleTick);
 				this.despawnCountdown = 2;
 			}
 		}
@@ -498,7 +498,7 @@ ruRunner.prototype.tryTargetFood = function() {
 					this.destinationX = firstFoodFound.x;
 					this.destinationY = firstFoodFound.y;
 					this.targetState = 0;
-					console.log("Targeted food " + this.cycleTick);
+					console.log(baTickCounter + ": Targeted food " + this.cycleTick);
 					return;
 				}
 			}
@@ -515,12 +515,12 @@ ruRunner.prototype.tryEatAndCheckTarget = function() {
 			return true;
 		} else if (this.x === this.foodTarget.x && this.y === this.foodTarget.y) {
 			if (this.foodTarget.isGood) {
-				console.log("Chomp, chomp. " + this.cycleTick);
+				console.log(baTickCounter + ": Chomp, chomp. " + this.cycleTick);
 				if (baIsNearTrap(this.x, this.y)) {
 					this.isDying = true;
 				}
 			} else {
-				console.log("Blughhhh. " + this.cycleTick);
+				console.log(baTickCounter + ": Blughhhh. " + this.cycleTick);
 				this.blughhhhCountdown = 3;
 				this.targetState = 0;
 				if (this.cycleTick > 5) {
@@ -585,7 +585,7 @@ ruRunner.prototype.setDestinationRandomWalk = function() {
 ruRunner.prototype.doTick1 = function() {
 	if (this.y === 14) {
 		this.despawnCountdown = 3;
-		console.log("Raaa!" + this.cycleTick);
+		console.log(baTickCounter + ": Raaa!" + this.cycleTick);
 		return;
 	}
 	if (this.blughhhhCountdown > 0) {
@@ -625,7 +625,7 @@ ruRunner.prototype.doTick4 = function() {
 ruRunner.prototype.doTick6 = function() {
 	if (this.y === 14) {
 		this.despawnCountdown = 3;
-		console.log("Raa!" + this.cycleTick);
+		console.log(baTickCounter + ": Raa!" + this.cycleTick);
 		return;
 	}
 	if (this.blughhhhCountdown > 0) {
