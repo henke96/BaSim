@@ -11,7 +11,7 @@ function simInit() {
 	let canvas = document.getElementById(HTML_CANVAS);
 	simMovementsInput = document.getElementById(HTML_RUNNER_MOVEMENTS);
 	simMovementsInput.onkeypress = function (e) {
-		if (e.key !== "e" && e.key !== "w" && e.key !== "s" && e.key !== "-") {
+		if (e.key === " ") {
 			e.preventDefault();
 		}
 	};
