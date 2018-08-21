@@ -45,7 +45,7 @@ function simStartStopButtonOnClick() {
 	} else {
 		let movements = simParseMovementsInput();
 		if (movements === null) {
-			alert("Invalid runner combination. Example: ws-s");
+			alert("Invalid runner movements. Example: ws-s");
 			return;
 		}
 		simIsRunning = true;
