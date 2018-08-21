@@ -402,7 +402,7 @@ rngRunnerRNG.prototype.rollMovement = function() {
 function ruInit(sniffDistance) {
 	ruSniffDistance = sniffDistance;
 }
-function ruRunner(x, y, runnerRNG, id) {
+function ruRunner(x, y, runnerRNG, isWave10, id) {
 	this.x = x;
 	this.y = y;
 	this.destinationX = x;
@@ -415,6 +415,7 @@ function ruRunner(x, y, runnerRNG, id) {
 	this.despawnCountdown = -1;
 	this.isDying = false;
 	this.runnerRNG = runnerRNG;
+	this.isWave10 = isWave10;
 	this.id = id;
 }
 ruRunner.prototype.tick = function() {
@@ -512,7 +513,6 @@ ruRunner.prototype.tryTargetFood = function() {
 					this.destinationX = firstFoodFound.x;
 					this.destinationY = firstFoodFound.y;
 					this.targetState = 0;
-					this.print("(target food)");
 					return;
 				}
 			}
@@ -526,7 +526,6 @@ ruRunner.prototype.tryEatAndCheckTarget = function() {
 		if (foodIndex === -1) {
 			this.foodTarget = null;
 			this.targetState = 0;
-			this.print("(crash)");
 			return true;
 		} else if (this.x === this.foodTarget.x && this.y === this.foodTarget.y) {
 			if (this.foodTarget.isGood) {
@@ -555,10 +554,14 @@ ruRunner.prototype.cancelDestination = function() {
 }
 ruRunner.prototype.setDestinationBlughhhh = function() {
 	this.destinationX = this.x;
-	this.destinationY = baEAST_TRAP_Y + 4;
+	if (isWave10) {
+		this.destinationY = baEAST_TRAP_Y - 4;
+	} else {
+		this.destinationY = baEAST_TRAP_Y + 4;
+	}
 }
 ruRunner.prototype.setDestinationRandomWalk = function() {
-	if (this.x <= 27) {
+	if (this.x <= 27) { // TODO: These same for wave 10?
 		if (this.y === 16 || this.y === 17) {	
 			this.destinationX = 30;
 			this.destinationY = 16;
@@ -585,13 +588,17 @@ ruRunner.prototype.setDestinationRandomWalk = function() {
 		this.destinationY = this.y - 5;
 	} else if (direction === rngWEST) {
 		this.destinationX = this.x - 5;
-		if (this.destinationX < baWEST_TRAP_X - 1) {
+		if (this.destinationX < baWEST_TRAP_X - 1) { // TODO: Same for wave 10?
 			this.destinationX = baWEST_TRAP_X - 1;
 		}
 		this.destinationY = this.y;
 	} else {
 		this.destinationX = this.x + 5;
-		if (this.destinationX > baEAST_TRAP_X) {
+		if (isWave10) {
+			if (this.destinationX > baEAST_TRAP_X - 1) {
+				this.destinationX = baEAST_TRAP_X - 1;
+			}
+		} else if (this.destinationX > baEAST_TRAP_X) {
 			this.destinationX = baEAST_TRAP_X;
 		}
 		this.destinationY = this.y;
@@ -714,9 +721,9 @@ function baTick() {
 			movements = "";
 		}
 		if (mCurrentMap === mWAVE_1_TO_9) {
-			baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y, new rngRunnerRNG(movements), baCurrentRunnerId++));
+			baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y, false, new rngRunnerRNG(movements), baCurrentRunnerId++));
 		} else {
-			baRunners.push(new ruRunner(baWAVE10_RUNNER_SPAWN_X, baWAVE10_RUNNER_SPAWN_Y, new rngRunnerRNG(movements), baCurrentRunnerId++));
+			baRunners.push(new ruRunner(baWAVE10_RUNNER_SPAWN_X, baWAVE10_RUNNER_SPAWN_Y, true, new rngRunnerRNG(movements), baCurrentRunnerId++));
 		}
 		++baRunnersAlive;
 	}
