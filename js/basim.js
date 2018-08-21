@@ -429,7 +429,6 @@ ruRunner.prototype.tick = function() {
 			if (!this.isDying) {
 				--baRunnersAlive;
 			}
-			this.print("(despawn)");
 		}
 	} else {
 		if (!this.isDying) {
