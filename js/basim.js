@@ -725,25 +725,30 @@ function baDrawOverlays() {
 	rSetDrawColor(160, 82, 45, 255);
 	rrOutline(45, 34);
 	rrOutline(15, 33);
-	rSetDrawColor(255, 0, 0, 255);
+	rSetDrawColor(240, 10, 10, 255);
 	if (mCurrentMap === mWAVE_1_TO_9) {
 		rrOutline(18, 45);
 	} else {
 		rrOutline(18, 46);
 	}
 	rrOutline(24, 47);
-	rSetDrawColor(0, 0, 255, 255);
+	rrFill(33, 14);
+	rSetDrawColor(10, 10, 240, 255);
 	if (mCurrentMap === mWAVE_1_TO_9) {
 		rrOutline(36, 47);
 	} else {
 		rrOutline(42, 46);
 	}
-	rSetDrawColor(0, 255, 0, 255);
+	rrFill(34, 14);
+	rSetDrawColor(10, 240, 10, 255);
 	if (mCurrentMap === mWAVE_1_TO_9) {
 		rrOutline(42, 45);
 	} else {
 		rrOutline(36, 47);
 	}
+	rrFill(35, 14);
+	rSetDrawColor(240, 240, 10, 255);
+	rrFill(36, 14);
 }
 function baDrawDetails() {
 	if (mCurrentMap !== mWAVE_1_TO_9 && mCurrentMap !== mWAVE10) {
