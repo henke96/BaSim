@@ -722,10 +722,10 @@ function baDrawOverlays() {
 	if (mCurrentMap !== mWAVE_1_TO_9 && mCurrentMap !== mWAVE10) {
 		return;
 	}
-	rSetDrawColor(160, 82, 45, 240);
+	rSetDrawColor(160, 82, 45, 220);
 	rrOutline(45, 34);
 	rrOutline(15, 33);
-	rSetDrawColor(240, 10, 10, 240);
+	rSetDrawColor(240, 10, 10, 220);
 	if (mCurrentMap === mWAVE_1_TO_9) {
 		rrOutline(18, 45);
 	} else {
@@ -733,21 +733,21 @@ function baDrawOverlays() {
 	}
 	rrOutline(24, 47);
 	rrFill(33, 14);
-	rSetDrawColor(10, 10, 240, 240);
+	rSetDrawColor(10, 10, 240, 220);
 	if (mCurrentMap === mWAVE_1_TO_9) {
 		rrOutline(36, 47);
 	} else {
 		rrOutline(42, 46);
 	}
 	rrFill(34, 14);
-	rSetDrawColor(10, 240, 10, 240);
+	rSetDrawColor(10, 240, 10, 220);
 	if (mCurrentMap === mWAVE_1_TO_9) {
 		rrOutline(42, 45);
 	} else {
 		rrOutline(36, 47);
 	}
 	rrFill(35, 14);
-	rSetDrawColor(240, 240, 10, 240);
+	rSetDrawColor(240, 240, 10, 220);
 	rrFill(36, 14);
 }
 function baDrawDetails() {
