@@ -509,7 +509,7 @@ ruRunner.prototype.tryTargetFood = function() {
 					this.destinationX = firstFoodFound.x;
 					this.destinationY = firstFoodFound.y;
 					this.targetState = 0;
-					this.print("(targeted food)");
+					this.print("(target food)");
 					return;
 				}
 			}
@@ -523,6 +523,7 @@ ruRunner.prototype.tryEatAndCheckTarget = function() {
 		if (foodIndex === -1) {
 			this.foodTarget = null;
 			this.targetState = 0;
+			this.print("(crash)");
 			return true;
 		} else if (this.x === this.foodTarget.x && this.y === this.foodTarget.y) {
 			if (this.foodTarget.isGood) {
