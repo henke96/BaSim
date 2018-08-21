@@ -117,11 +117,14 @@ function simParseMovementsInput() {
 	return movements;
 }
 function simWindowOnKeyDown(e) {
-	if (e.key === "r") {
-		mAddItem(new fFood(plX, plY, true));
-	} else if (e.key === "w") {
-		mAddItem(new fFood(plX, plY, false));
-	} else if (e.key === "s") {
+	if (simIsRunning) {
+		if (e.key === "r") {
+			mAddItem(new fFood(plX, plY, true));
+		} else if (e.key === "w") {
+			mAddItem(new fFood(plX, plY, false));
+		}
+	}
+	if (e.key === "s") {
 		simStartStopButtonOnClick();
 	}
 }
