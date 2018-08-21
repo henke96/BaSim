@@ -554,7 +554,7 @@ ruRunner.prototype.cancelDestination = function() {
 }
 ruRunner.prototype.setDestinationBlughhhh = function() {
 	this.destinationX = this.x;
-	if (isWave10) {
+	if (this.isWave10) {
 		this.destinationY = baEAST_TRAP_Y - 4;
 	} else {
 		this.destinationY = baEAST_TRAP_Y + 4;
@@ -594,7 +594,7 @@ ruRunner.prototype.setDestinationRandomWalk = function() {
 		this.destinationY = this.y;
 	} else {
 		this.destinationX = this.x + 5;
-		if (isWave10) {
+		if (this.isWave10) {
 			if (this.destinationX > baEAST_TRAP_X - 1) {
 				this.destinationX = baEAST_TRAP_X - 1;
 			}
