@@ -950,12 +950,10 @@ function mHasLineOfSight(x1, y1, x2, y2) {
 	let dxAbs = Math.abs(dx);
 	let dy = y2 - y1;
 	let dyAbs = Math.abs(dy);
-	
 	if (dxAbs > dyAbs) {
 		let xTile = x1;
 		let y = y1 << 16;
-		let slope = Math.trunc((dy << 16) / dxAbs); // Integer division
-		
+		let slope = Math.trunc((dy << 16) / dxAbs);
 		let xInc;
 		let xMask;
 		if (dx > 0) {
@@ -968,12 +966,11 @@ function mHasLineOfSight(x1, y1, x2, y2) {
 		let yMask;
 		y += 0x8000;
 		if (dy < 0) {
-			y -= 1; // For correct rounding
+			y -= 1;
 			yMask = mLOS_NORTH_MASK | mLOS_FULL_MASK;
 		} else {
 			yMask = mLOS_SOUTH_MASK | mLOS_FULL_MASK;
 		}
-		
 		while (xTile !== x2) {
 			xTile += xInc;
 			let yTile = y >>> 16;
@@ -989,8 +986,7 @@ function mHasLineOfSight(x1, y1, x2, y2) {
 	} else {
 		let yTile = y1;
 		let x = x1 << 16;
-		let slope = Math.trunc((dx << 16) / dyAbs); // Integer division
-		
+		let slope = Math.trunc((dx << 16) / dyAbs);
 		let yInc;
 		let yMask;
 		if (dy > 0) {
@@ -1000,16 +996,14 @@ function mHasLineOfSight(x1, y1, x2, y2) {
 			yInc = -1;
 			yMask = mLOS_NORTH_MASK | mLOS_FULL_MASK;
 		}
-		
 		let xMask;
 		x += 0x8000;
 		if (dx < 0) {
-			x -= 1; // For correct rounding
+			x -= 1;
 			xMask = mLOS_EAST_MASK | mLOS_FULL_MASK;
 		} else {
 			xMask = mLOS_WEST_MASK | mLOS_FULL_MASK;
 		}
-		
 		while (yTile !== y2) {
 			yTile += yInc;
 			let xTile = x >>> 16;
