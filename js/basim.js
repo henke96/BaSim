@@ -125,6 +125,15 @@ function simWindowOnKeyDown(e) {
 			mAddItem(new fFood(plX, plY, true));
 		} else if (e.key === "w") {
 			mAddItem(new fFood(plX, plY, false));
+		} else if (e.key === "e") {
+			let itemZone = mGetItemZone(plX >>> 3, plY >>> 3);
+			for (let i = 0; i < itemZone.length; ++i) {
+				let item = itemZone[i];
+				if (plX === item.x && plY === item.y) {
+					itemZone.splice(i, 1);
+					break;
+				}
+			}
 		}
 	}
 	if (e.key === " ") {
