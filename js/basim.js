@@ -107,7 +107,7 @@ function simParseMovementsInput() {
 	let movements = simMovementsInput.value.split("-");
 	for (let i = 0; i < movements.length; ++i) {
 		let moves = movements[i];
-		for (let j = 0; j < move.length; ++j) {
+		for (let j = 0; j < moves.length; ++j) {
 			let move = moves[j];
 			if (move !== "" && move !== "s" && move !== "w" && move !== "e") {
 				return null;
