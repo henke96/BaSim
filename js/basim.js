@@ -91,7 +91,7 @@ function simStartStopButtonOnClick() {
 			totalRunners = 9;
 			break;
 		}
-		baInit(maxRunnersAlive, totalRunners, );
+		baInit(maxRunnersAlive, totalRunners, movements);
 		if (mCurrentMap === mWAVE10) {
 			plInit(baWAVE10_DEFENDER_SPAWN_X, baWAVE10_DEFENDER_SPAWN_Y);
 		} else {
@@ -105,7 +105,7 @@ function simParseMovementsInput() {
 	let movements = simMovementsInput.value.split("-");
 	for (let i = 0; i < movements.length; ++i) {
 		let move = movements[i];
-		if (move !== "s" && move !== "w" && move !== "e") {
+		if (move !== "" && move !== "s" && move !== "w" && move !== "e") {
 			return null;
 		}
 	}
