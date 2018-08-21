@@ -721,9 +721,9 @@ function baTick() {
 			movements = "";
 		}
 		if (mCurrentMap === mWAVE_1_TO_9) {
-			baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y, false, new rngRunnerRNG(movements), baCurrentRunnerId++));
+			baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y, new rngRunnerRNG(movements), false, baCurrentRunnerId++));
 		} else {
-			baRunners.push(new ruRunner(baWAVE10_RUNNER_SPAWN_X, baWAVE10_RUNNER_SPAWN_Y, true, new rngRunnerRNG(movements), baCurrentRunnerId++));
+			baRunners.push(new ruRunner(baWAVE10_RUNNER_SPAWN_X, baWAVE10_RUNNER_SPAWN_Y, new rngRunnerRNG(movements), true, baCurrentRunnerId++));
 		}
 		++baRunnersAlive;
 	}
