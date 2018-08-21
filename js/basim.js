@@ -1,46 +1,124 @@
 'use strict';
-const HTML_CANVAS_ID = "basimcanvas";
-const HTML_RUNNER_MOVEMENTS_ID = "runnermovements";
+const HTML_CANVAS = "basimcanvas";
+const HTML_RUNNER_MOVEMENTS = "runnermovements";
 const HTML_START_BUTTON = "wavestart";
-window.onload = init;
-
-function init() {
-	let canvas = document.getElementById(HTML_CANVAS_ID);
+const HTML_WAVE_SELECT = "waveselect";
+const HTML_TICK_COUNT = "tickcount";
+const HTML_DEF_LEVEL_SELECT = "deflevelselect";
+window.onload = simInit;
+//{ Simulation - sim
+function simInit() {
+	let canvas = document.getElementById(HTML_CANVAS);
+	simMovementsInput = document.getElementById(HTML_RUNNER_MOVEMENTS);
+	simStartStopButton = document.getElementById(HTML_START_BUTTON);
+	simStartStopButton.onclick = simStartStopButtonOnClick;
+	simWaveSelect = document.getElementById(HTML_WAVE_SELECT);
+	simWaveSelect.onchange = simWaveSelectOnChange;
+	simDefLevelSelect = document.getElementById(HTML_DEF_LEVEL_SELECT);
+	simDefLevelSelect.onchange = simDefLevelSelectOnChange;
+	simTickCountSpan = document.getElementById(HTML_TICK_COUNT);
 	rInit(canvas, 64*12, 64*12);
 	rrInit(12);
 	mInit(mWAVE_1_TO_9, 64, 64);
-	baInit(0, 0, "");
 	ruInit(5);
-	plInit(baWAVE1_DEFENDER_SPAWN_X, baWAVE1_DEFENDER_SPAWN_Y);
-	draw();
-	window.onkeydown = onKeyDown;
-	canvas.onmousedown = onMouseDown;
+	simReset();
+	window.onkeydown = simWindowOnKeyDown;
+	canvas.onmousedown = simCanvasOnMouseDown;
 	canvas.oncontextmenu = function (e) {
 		e.preventDefault();
 	};
-	movementsInput = document.getElementById(HTML_RUNNER_MOVEMENTS_ID);
-	document.getElementById(HTML_START_BUTTON).onclick = startWave;
 }
-
-function startWave() {
-	clearInterval(tickTimerId);
-	mInit(mWAVE_1_TO_9, 64, 64);
-	baInit(2, 4, movementsInput.value.split("-"));
-	ruInit(5);
-	plInit(baWAVE1_DEFENDER_SPAWN_X, baWAVE1_DEFENDER_SPAWN_Y);
-	draw();
-	tickTimerId = setInterval(tick, 600);
+function simReset() {
+	if (simIsRunning) {
+		clearInterval(simTickTimerId);
+	}
+	simIsRunning = false;
+	simStartStopButton.innerHTML = "Start Wave";
+	baInit(0, 0, "");
+	plInit(-1, 0);
+	simDraw();
 }
-
-function onKeyDown(e) {
+function simStartStopButtonOnClick() {
+	if (simIsRunning) {
+		mResetMap();
+		simReset();
+	} else {
+		let movements = simParseMovementsInput();
+		if (movements === null) {
+			alert("Invalid runner combination. Example: ws-s");
+			return;
+		}
+		simIsRunning = true;
+		simStartStopButton.innerHTML = "Stop Wave";
+		let maxRunnersAlive = 0;
+		let totalRunners = 0;
+		switch(Number(simWaveSelect.value)) {
+		case 1:
+			maxRunnersAlive = 2;
+			totalRunners = 2;
+			break;
+		case 2:
+			maxRunnersAlive = 2;
+			totalRunners = 3;
+			break;
+		case 3:
+			maxRunnersAlive = 2;
+			totalRunners = 4;
+			break;
+		case 4:
+			maxRunnersAlive = 3;
+			totalRunners = 4;
+			break;
+		case 5:
+			maxRunnersAlive = 4;
+			totalRunners = 5;
+			break;
+		case 6:
+			maxRunnersAlive = 4;
+			totalRunners = 6;
+			break;
+		case 7:
+		case 10:
+			maxRunnersAlive = 5;
+			totalRunners = 6;
+			break;
+		case 8:
+			maxRunnersAlive = 5;
+			totalRunners = 7;
+			break;
+		case 9:
+			maxRunnersAlive = 5;
+			totalRunners = 9;
+			break;
+		}
+		baInit(maxRunnersAlive, totalRunners, );
+		if (mCurrentMap === mWAVE10) {
+			plInit(baWAVE10_DEFENDER_SPAWN_X, baWAVE10_DEFENDER_SPAWN_Y);
+		} else {
+			plInit(baWAVE1_DEFENDER_SPAWN_X, baWAVE1_DEFENDER_SPAWN_Y);
+		}
+		simTick();
+		simTickTimerId = setInterval(simTick, 600);
+	}
+}
+function simParseMovementsInput() {
+	let movements = simMovementsInput.value.split("-");
+	for (let i = 0; i < movements.length; ++i) {
+		let move = movements[i];
+		if (move !== "s" && move !== "w" && move !== "e") {
+			return null;
+		}
+	}
+	return movements;
+}
+function simWindowOnKeyDown(e) {
 	if (e.key === "r") {
 		mAddItem(new fFood(plX, plY, true));
 	} else if (e.key === "w") {
 		mAddItem(new fFood(plX, plY, false));
 	}
 }
-
-function onMouseDown(e) {
+function simCanvasOnMouseDown(e) {
 	var canvasRect = rCanvas.getBoundingClientRect();
 	let xTile = Math.trunc((e.clientX - canvasRect.left) / rrTileSize);
 	let yTile = Math.trunc((canvasRect.bottom - 1 - e.clientY) / rrTileSize);
@@ -55,12 +133,25 @@ function onMouseDown(e) {
 		}
 	}
 }
-function tick() {
+function simWaveSelectOnChange(e) {
+	if (simWaveSelect.value === "10") {
+		mInit(mWAVE10, 64, 64);
+	} else {
+		mInit(mWAVE_1_TO_9, 64, 64);
+	}
+	simReset();
+}
+function simDefLevelSelectOnChange(e) {
+	mResetMap();
+	simReset();
+	ruInit(Number(simDefLevelSelect.value));
+}
+function simTick() {
 	baUpdate();
 	plUpdate();
-	draw();
+	simDraw();
 }
-function draw() {
+function simDraw() {
 	mDrawMap();
 	baDrawDetails();
 	mDrawItems();
@@ -70,8 +161,14 @@ function draw() {
 	baDrawOverlays();
 	rPresent();
 }
-var tickTimerId;
-var movementsInput;
+var simTickTimerId;
+var simMovementsInput;
+var simStartStopButton;
+var simWaveSelect;
+var simDefLevelSelect;
+var simTickCountSpan;
+var simIsRunning;
+//}
 //{ Player - pl
 function plInit(x, y) {
 	plX = x;
@@ -93,8 +190,10 @@ function plUpdate() {
 	}
 }
 function plDrawPlayer() {
-	rSetDrawColor(240, 240, 240, 200);
-	rrFill(plX, plY);
+	if (plX >= 0) {
+		rSetDrawColor(240, 240, 240, 200);
+		rrFill(plX, plY);
+	}
 }
 function plPathfind(destX, destY) {
 	for (let i = 0; i < mWidthTiles*mHeightTiles; ++i) {
@@ -562,8 +661,8 @@ const baWAVE10_RUNNER_SPAWN_X = 42;
 const baWAVE10_RUNNER_SPAWN_Y = 46;
 const baWAVE1_DEFENDER_SPAWN_X = 33;
 const baWAVE1_DEFENDER_SPAWN_Y = 16;
-const baWAVE10_DEFENDER_SPAWN_X = -1;
-const baWAVE10_DEFENDER_SPAWN_Y = -1;
+const baWAVE10_DEFENDER_SPAWN_X = 28;
+const baWAVE10_DEFENDER_SPAWN_Y = 16;
 function baInit(maxRunnersAlive, totalRunners, runnerMovements) {
 	baRunners = [];
 	baRunnersToRemove = [];
@@ -575,6 +674,7 @@ function baInit(maxRunnersAlive, totalRunners, runnerMovements) {
 	baCollectorX = -1;
 	baRunnerMovements = runnerMovements;
 	baRunnerMovementsIndex = 0;
+	simTickCountSpan.innerHTML = baTickCounter;
 }
 function baUpdate() {
 	++baTickCounter;
@@ -601,6 +701,7 @@ function baUpdate() {
 		}
 		++baRunnersAlive;
 	}
+	simTickCountSpan.innerHTML = baTickCounter;
 }
 function baDrawOverlays() { 
 	if (mCurrentMap !== mWAVE_1_TO_9 && mCurrentMap !== mWAVE10) {
@@ -630,7 +731,7 @@ function baDrawOverlays() {
 	}
 }
 function baDrawDetails() {
-	if (mCurrentMap !== mWAVE_1_TO_9 && currentMap !== mWAVE10) {
+	if (mCurrentMap !== mWAVE_1_TO_9 && mCurrentMap !== mWAVE10) {
 		return;
 	}
 	rSetDrawColor(160, 82, 45, 255);
@@ -725,9 +826,12 @@ function mSetMap(map, widthTiles, heightTiles) {
 	mCurrentMap = map;
 	mWidthTiles = widthTiles;
 	mHeightTiles = heightTiles;
+	mResetMap();
+}
+function mResetMap() {
 	mItemZones = [];
-	mItemZonesWidth = 1 + ((widthTiles - 1) >> 3);
-	mItemZonesHeight = 1 + ((heightTiles - 1) >> 3);
+	mItemZonesWidth = 1 + ((mWidthTiles - 1) >> 3);
+	mItemZonesHeight = 1 + ((mHeightTiles - 1) >> 3);
 	for (let xZone = 0; xZone < mItemZonesWidth; ++xZone) {
 		for (let yZone = 0; yZone < mItemZonesHeight; ++yZone) {
 			mItemZones[xZone + mItemZonesWidth*yZone] = [];

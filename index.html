@@ -1,8 +1,22 @@
 <!DOCTYPE html>
 <title>Ba simulator</title>
 <script src="js/basim.js"></script>
-<body>
-<input id="runnermovements" type="text"/>
-<button id="wavestart">Start wave!</button><br>
+Defender level: <select id="deflevelselect">
+<option value="4">Level 1</option>
+<option value="5" selected>Level 2-5</option>
+</select><br>
+Wave: <select id="waveselect">
+<option value="1">Wave 1</option>
+<option value="2">Wave 2</option>
+<option value="3">Wave 3</option>
+<option value="4">Wave 4</option>
+<option value="5">Wave 5</option>
+<option value="6">Wave 6</option>
+<option value="7">Wave 7</option>
+<option value="8">Wave 8</option>
+<option value="9">Wave 9</option>
+<option value="10">Wave 10</option>
+</select><br>
+Runner combination: <input id="runnermovements" type="text"/><br>
+<button id="wavestart"></button> Tick count: <span id="tickcount"></span><br>
 <canvas id="basimcanvas"></canvas>
-</body>
