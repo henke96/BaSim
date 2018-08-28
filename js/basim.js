@@ -935,8 +935,8 @@ function mDrawItems() {
 function mDrawMap() {
 	rSetDrawColor(206, 183, 117, 255);
 	rClear();
-	for (let y = 0; y < 64; ++y) {	
-		for (let x = 0; x < 64; ++x) {
+	for (let y = 0; y < mWidthTiles; ++y) {	
+		for (let x = 0; x < mHeightTiles; ++x) {
 			let tileFlag = mGetTileFlag(x, y);
 			if ((tileFlag & mLOS_FULL_MASK) !== 0) {
 				rSetDrawColor(0, 0, 0, 255);
