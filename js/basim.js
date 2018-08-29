@@ -140,6 +140,7 @@ function simWindowOnKeyDown(e) {
 	}
 	if (e.key === " ") {
 		simStartStopButtonOnClick();
+		e.preventDefault();
 	}
 }
 function simCanvasOnMouseDown(e) {
