@@ -128,14 +128,8 @@ function simWindowOnKeyDown(e) {
 		} else if (e.key === "w") {
 			mAddItem(new fFood(plX, plY, false));
 		} else if (e.key === "e") {
-			let itemZone = mGetItemZone(plX >>> 3, plY >>> 3);
-			for (let i = 0; i < itemZone.length; ++i) {
-				let item = itemZone[i];
-				if (plX === item.x && plY === item.y) {
-					itemZone.splice(i, 1);
-					break;
-				}
-			}
+			plShouldPickupFood = true;
+			plPathfind(plX, plY);
 		}
 	}
 	if (e.key === " ") {
@@ -203,8 +197,21 @@ function plInit(x, y) {
 	plPathQueueY = [];
 	plShortestDistances = [];
 	plWayPoints = [];
+	plShouldPickupFood = false;
 }
 function plTick() {
+	if (plShouldPickupFood) {
+		let itemZone = mGetItemZone(plX >>> 3, plY >>> 3);
+		for (let i = 0; i < itemZone.length; ++i) {
+			let item = itemZone[i];
+			if (plX === item.x && plY === item.y) {
+				itemZone.splice(i, 1);
+				break;
+			}
+		}
+		plShouldPickupFood = false;
+	}
+
 	if (plPathQueuePos > 0) {
 		plX = plPathQueueX[--plPathQueuePos];
 		plY = plPathQueueY[plPathQueuePos];
@@ -363,6 +370,7 @@ var plPathQueueX;
 var plPathQueueY;
 var plX;
 var plY;
+var plShouldPickupFood;
 //}
 //{ Food - f
 function fFood(x, y, isGood) {
@@ -573,7 +581,7 @@ ruRunner.prototype.setDestinationBlughhhh = function() {
 }
 ruRunner.prototype.setDestinationRandomWalk = function() {
 	if (this.x <= 27) { // TODO: These same for wave 10?
-		if (this.y === 8 || this.y === 9) {	
+		if (this.y === 8 || this.y === 9) {
 			this.destinationX = 30;
 			this.destinationY = 8;
 			return;
@@ -740,7 +748,7 @@ function baTick() {
 	}
 	simTickCountSpan.innerHTML = baTickCounter;
 }
-function baDrawOverlays() { 
+function baDrawOverlays() {
 	if (mCurrentMap !== mWAVE_1_TO_9 && mCurrentMap !== mWAVE10) {
 		return;
 	}
@@ -934,7 +942,7 @@ function mDrawItems() {
 function mDrawMap() {
 	rSetDrawColor(206, 183, 117, 255);
 	rClear();
-	for (let y = 0; y < mHeightTiles; ++y) {	
+	for (let y = 0; y < mHeightTiles; ++y) {
 		for (let x = 0; x < mWidthTiles; ++x) {
 			let tileFlag = mGetTileFlag(x, y);
 			if ((tileFlag & mLOS_FULL_MASK) !== 0) {
