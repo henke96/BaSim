@@ -142,6 +142,7 @@ function simCanvasOnMouseDown(e) {
 	let xTile = Math.trunc((e.clientX - canvasRect.left) / rrTileSize);
 	let yTile = Math.trunc((canvasRect.bottom - 1 - e.clientY) / rrTileSize);
 	if (e.button === 0) {
+		plShouldPickupFood = false;
 		plPathfind(xTile, yTile);
 	} else if (e.button === 2) {
 		if (xTile === baCollectorX && yTile === baCollectorY) {
