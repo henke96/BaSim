@@ -57,47 +57,67 @@ function simStartStopButtonOnClick() {
 		simStartStopButton.innerHTML = "Stop Wave";
 		let maxRunnersAlive = 0;
 		let totalRunners = 0;
+		let maxHealersAlive = 0;
+		let totalHealers = 0;
 		let wave = simWaveSelect.value;
 		switch(Number(wave)) {
 		case 1:
 			maxRunnersAlive = 2;
 			totalRunners = 2;
+			maxHealersAlive = 2;
+			totalHealers = 2;
 			break;
 		case 2:
 			maxRunnersAlive = 2;
 			totalRunners = 3;
+			maxHealersAlive = 3;
+			totalHealers = 3;
 			break;
 		case 3:
 			maxRunnersAlive = 2;
 			totalRunners = 4;
+			maxHealersAlive = 2;
+			totalHealers = 3;
 			break;
 		case 4:
 			maxRunnersAlive = 3;
 			totalRunners = 4;
+			maxHealersAlive = 3;
+			totalHealers = 4;
 			break;
 		case 5:
 			maxRunnersAlive = 4;
 			totalRunners = 5;
+			maxHealersAlive = 4;
+			totalHealers = 5;
 			break;
 		case 6:
 			maxRunnersAlive = 4;
 			totalRunners = 6;
+			maxHealersAlive = 4;
+			totalHealers = 6;
 			break;
 		case 7:
 		case 10:
 			maxRunnersAlive = 5;
 			totalRunners = 6;
+			maxHealersAlive = 4;
+			totalHealers = 7;
 			break;
 		case 8:
 			maxRunnersAlive = 5;
 			totalRunners = 7;
+			maxHealersAlive = 5;
+			totalHealers = 7;
 			break;
 		case 9:
 			maxRunnersAlive = 5;
 			totalRunners = 9;
+			maxHealersAlive = 6;
+			totalHealers = 8;
 			break;
 		}
-		baInit(maxRunnersAlive, totalRunners, movements);
+		baInit(maxRunnersAlive, totalRunners, maxHealersAlive, totalHealers, movements);
 		if (mCurrentMap === mWAVE10) {
 			plInit(baWAVE10_DEFENDER_SPAWN_X, baWAVE10_DEFENDER_SPAWN_Y);
 		} else {
@@ -450,6 +470,41 @@ rngRunnerRNG.prototype.rollMovement = function() {
 	return rngEAST;
 }
 //}
+//{ Healer - he
+function heHealer(x, y) {
+	this.spawnX = x;
+	this.spawnY = y;
+	this.x = x;
+	this.y = y;
+	this.destinationX = x;
+	this.destinationY = y;
+}
+heHealer.prototype.tick = function() {
+	let rnd = Math.floor(Math.random() * 8);
+	if (rnd === 0) {
+		const wanderRange = 60;
+		let rndX = Math.floor(Math.random() * (2*wanderRange + 1));
+		this.destinationX = this.spawnX - wanderRange + rndX;
+		let rndY = Math.floor(Math.random() * (2*wanderRange + 1));
+		this.destinationY = this.spawnY - wanderRange + rndY;
+	}
+	let startX = this.x;
+	if (this.destinationX > startX) {
+		if (!baTileBlocksPenance(startX + 1, this.y) && mCanMoveEast(startX, this.y)) {
+			++this.x;
+		}
+	} else if (this.destinationX < startX && !baTileBlocksPenance(startX - 1, this.y) && mCanMoveWest(startX, this.y)) {
+		--this.x;
+	}
+	if (this.destinationY > this.y) {
+		if (!baTileBlocksPenance(startX, this.y + 1) && !baTileBlocksPenance(this.x, this.y + 1) && mCanMoveNorth(startX, this.y) && mCanMoveNorth(this.x, this.y)) {
+			++this.y;
+		}
+	} else if (this.destinationY < this.y && !baTileBlocksPenance(startX, this.y - 1) && !baTileBlocksPenance(this.x, this.y - 1) && mCanMoveSouth(startX, this.y) && mCanMoveSouth(this.x, this.y)) {
+		--this.y;
+	}
+}
+//}
 //{ Runner - ru
 function ruInit(sniffDistance) {
 	ruSniffDistance = sniffDistance;
@@ -749,17 +804,28 @@ const baWAVE1_DEFENDER_SPAWN_X = 33;
 const baWAVE1_DEFENDER_SPAWN_Y = 8;
 const baWAVE10_DEFENDER_SPAWN_X = 28;
 const baWAVE10_DEFENDER_SPAWN_Y = 8;
-function baInit(maxRunnersAlive, totalRunners, runnerMovements) {
+const baWAVE1_HEALER_SPAWN_X = 42;
+const baWAVE1_HEALER_SPAWN_Y = 37;
+const baWAVE10_HEALER_SPAWN_X = 36;
+const baWAVE10_HEALER_SPAWN_Y = 39;
+function baInit(maxRunnersAlive, totalRunners, maxHealersAlive, totalHealers, runnerMovements) {
 	baRunners = [];
 	baRunnersToRemove = [];
-	baTickCounter = 0;
 	baRunnersAlive = 0;
 	baRunnersKilled = 0;
+	baHealersAlive = 0;
+	baHealersKilled = 0;
 	baMaxRunnersAlive = maxRunnersAlive;
 	baTotalRunners = totalRunners;
-	baCollectorX = -1;
+	baMaxHealersAlive = maxHealersAlive;
+	baTotalHealers = totalHealers;
 	baRunnerMovements = runnerMovements;
 	baRunnerMovementsIndex = 0;
+
+	baHealers = [];
+
+	baTickCounter = 0;
+	baCollectorX = -1;
 	baCurrentRunnerId = 1;
 	baEastTrapCharges = 2;
 	baWestTrapCharges = 2;
@@ -771,24 +837,37 @@ function baTick() {
 	for (let i = 0; i < baRunners.length; ++i) {
 		baRunners[i].tick();
 	}
+	for (let i = 0; i < baHealers.length; ++i) {
+		baHealers[i].tick(); // TODO: healers and runners should be in same array.
+	}
 	for (let i = 0; i < baRunnersToRemove.length; ++i) {
 		let runner = baRunnersToRemove[i];
 		let index = baRunners.indexOf(runner);
 		baRunners.splice(index, 1);
 	}
-	if (baTickCounter > 1 && baTickCounter % 10 === 1 && baRunnersAlive < baMaxRunnersAlive && baRunnersKilled + baRunnersAlive < baTotalRunners) {
-		let movements;
-		if (baRunnerMovements.length > baRunnerMovementsIndex) {
-			movements = baRunnerMovements[baRunnerMovementsIndex++];
-		} else {
-			movements = "";
+	if (baTickCounter > 1 && baTickCounter % 10 === 1) {
+		if (baRunnersAlive < baMaxRunnersAlive && baRunnersKilled + baRunnersAlive < baTotalRunners) {
+			let movements;
+			if (baRunnerMovements.length > baRunnerMovementsIndex) {
+				movements = baRunnerMovements[baRunnerMovementsIndex++];
+			} else {
+				movements = "";
+			}
+			if (mCurrentMap === mWAVE_1_TO_9) {
+				baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y, new rngRunnerRNG(movements), false, baCurrentRunnerId++));
+			} else {
+				baRunners.push(new ruRunner(baWAVE10_RUNNER_SPAWN_X, baWAVE10_RUNNER_SPAWN_Y, new rngRunnerRNG(movements), true, baCurrentRunnerId++));
+			}
+			++baRunnersAlive;
 		}
-		if (mCurrentMap === mWAVE_1_TO_9) {
-			baRunners.push(new ruRunner(baWAVE1_RUNNER_SPAWN_X, baWAVE1_RUNNER_SPAWN_Y, new rngRunnerRNG(movements), false, baCurrentRunnerId++));
-		} else {
-			baRunners.push(new ruRunner(baWAVE10_RUNNER_SPAWN_X, baWAVE10_RUNNER_SPAWN_Y, new rngRunnerRNG(movements), true, baCurrentRunnerId++));
+		if (baHealersAlive < baMaxHealersAlive && baHealersKilled + baHealersAlive < baTotalHealers) {
+			if (mCurrentMap === mWAVE_1_TO_9) {
+				baHealers.push(new heHealer(baWAVE1_HEALER_SPAWN_X, baWAVE1_HEALER_SPAWN_Y));
+			} else {
+				baHealers.push(new heHealer(baWAVE10_HEALER_SPAWN_X, baWAVE10_HEALER_SPAWN_Y));
+			}
+			++baHealersAlive;
 		}
-		++baRunnersAlive;
 	}
 	simTickCountSpan.innerHTML = baTickCounter;
 }
@@ -872,6 +951,10 @@ function baDrawEntities() {
 	for (let i = 0; i < baRunners.length; ++i) {
 		rrFill(baRunners[i].x, baRunners[i].y);
 	}
+	rSetDrawColor(10, 240, 10, 127);
+	for (let i = 0; i < baHealers.length; ++i) {
+		rrFill(baHealers[i].x, baHealers[i].y);
+	}
 	if (baCollectorX !== -1) {
 		rSetDrawColor(240, 240, 10, 200);
 		rrFill(baCollectorX, baCollectorY);
@@ -917,10 +1000,15 @@ var baRunnersAlive;
 var baRunnersKilled;
 var baTotalRunners;
 var baMaxRunnersAlive;
-var baCollectorX;
-var baCollectorY;
 var baRunnerMovements;
 var baRunnerMovementsIndex;
+var baHealers;
+var baHealersAlive;
+var baHealersKilled;
+var baTotalHealers;
+var baMaxHealersAlive;
+var baCollectorX;
+var baCollectorY;
 var baCurrentRunnerId;
 var baEastTrapCharges;
 var baWestTrapCharges;
