@@ -1,9 +1,27 @@
 <!DOCTYPE html>
 <title>Ba simulator</title>
 <script src="js/basim.js"></script>
-Defender level: <select id="deflevelselect">
-<option value="4">Level 1</option>
-<option value="5" selected>Level 2-5</option>
+<style>
+table, th, td {
+border: 1px solid black;
+border-collapse: collapse;
+}
+th, td {
+padding: 2px 4px;
+}
+th:last-child {
+width: 8em;
+}
+td {
+text-align: center;
+}
+</style>
+Lure distance: <select id="deflevelselect">
+<option value="4">4 tiles (Level 1)</option>
+<option value="5" selected>5 tiles (Level 2-5)</option>
+<option value="6">6 tiles</option>
+<option value="7">7 tiles</option>
+<option value="8">8 tiles</option>
 </select><br>
 Wave: <select id="waveselect">
 <option value="1">Wave 1</option>
@@ -18,8 +36,24 @@ Wave: <select id="waveselect">
 <option value="10">Wave 10</option>
 </select><br>
 Runner movements: <input id="runnermovements" type="text"/><br>
-<button id="wavestart"></button> Tick count: <span id="tickcount"></span><br>
+<button id="wavestart"></button>
+<button id="wavepause" style="display: none;"></button>
+<button id="wavestep" style="display: none;">Step</button>
+Tick count: <span id="tickcount"></span><br>
 <canvas id="basimcanvas"></canvas><br>
+<table id="runnertable" style="display: none;">
+    <thead>
+        <tr>
+            <th>Runner</th>
+            <th>Tick</th>
+            <th>State</th>
+            <th>Position</th>
+            <th>Destination</th>
+            <th>Target</th>
+            <th>Chat</th>
+        </tr>
+    </thead>
+</table>
 <b>space</b> starts or stops the wave.<br>
 <b>left-click</b> moves the player.<br>
 <b>right-click</b> places a collector.<br>

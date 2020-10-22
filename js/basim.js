@@ -2,9 +2,15 @@
 const HTML_CANVAS = "basimcanvas";
 const HTML_RUNNER_MOVEMENTS = "runnermovements";
 const HTML_START_BUTTON = "wavestart";
+const HTML_PAUSE_BUTTON = "wavepause";
+const HTML_STEP_BUTTON = "wavestep";
 const HTML_WAVE_SELECT = "waveselect";
 const HTML_TICK_COUNT = "tickcount";
 const HTML_DEF_LEVEL_SELECT = "deflevelselect";
+const HTML_RUNNER_TABLE = "runnertable";
+
+const ENABLE_HEALERS = false;
+
 window.onload = simInit;
 //{ Simulation - sim
 function simInit() {
@@ -17,11 +23,19 @@ function simInit() {
 	};
 	simStartStopButton = document.getElementById(HTML_START_BUTTON);
 	simStartStopButton.onclick = simStartStopButtonOnClick;
+	simPauseResumeButton = document.getElementById(HTML_PAUSE_BUTTON);
+	simPauseResumeButton.onclick = simPauseResumeButtonOnClick;
+	simStepButton = document.getElementById(HTML_STEP_BUTTON);
+	simStepButton.onclick = simStepButtonOnClick;
 	simWaveSelect = document.getElementById(HTML_WAVE_SELECT);
 	simWaveSelect.onchange = simWaveSelectOnChange;
 	simDefLevelSelect = document.getElementById(HTML_DEF_LEVEL_SELECT);
 	simDefLevelSelect.onchange = simDefLevelSelectOnChange;
 	simTickCountSpan = document.getElementById(HTML_TICK_COUNT);
+	simRunnerTable = document.getElementById(HTML_RUNNER_TABLE);
+
+	simSetRunning(false);
+
 	rInit(canvas, 64*12, 48*12);
 	rrInit(12);
 	mInit(mWAVE_1_TO_9, 64, 48);
@@ -33,15 +47,94 @@ function simInit() {
 		e.preventDefault();
 	};
 }
+function simUpdateRunnerTable() {
+	if (!simIsRunning) {
+		simRunnerTable.style.display = "none";
+		return;
+	}
+	// Generate table body
+	let tableBody = document.createElement("tbody");
+	for (let i = 0; i < baRunners.length; ++i) {
+		let runner = baRunners[i];
+		let tableRow = document.createElement("tr");
+		let td = document.createElement("td");
+		td.innerHTML = runner.id;
+		tableRow.appendChild(td);
+		td = document.createElement("td");
+		td.innerHTML = runner.cycleTick;
+		tableRow.appendChild(td);
+		td = document.createElement("td");
+		td.innerHTML = runner.targetState;
+		tableRow.appendChild(td);
+		td = document.createElement("td");
+		td.innerHTML = "(" + runner.x + ", " + runner.y + ")";
+		tableRow.appendChild(td);
+		td = document.createElement("td");
+		td.innerHTML = "(" + runner.destinationX + ", " + runner.destinationY + ")";
+		tableRow.appendChild(td);
+		td = document.createElement("td");
+		if (runner.foodTarget !== null) td.innerHTML = "#" + runner.foodTarget.id;
+		else td.innerHTML = "None";
+		tableRow.appendChild(td);
+		td = document.createElement("td");
+		td.innerHTML = runner.chat;
+		tableRow.appendChild(td);
+		tableBody.appendChild(tableRow);
+	}
+	let previousBody = simRunnerTable.getElementsByTagName("tbody")[0];
+	if (previousBody) simRunnerTable.removeChild(previousBody);
+	simRunnerTable.appendChild(tableBody);
+	simRunnerTable.style.display = "table";	
+}
 function simReset() {
 	if (simIsRunning) {
 		clearInterval(simTickTimerId);
 	}
-	simIsRunning = false;
-	simStartStopButton.innerHTML = "Start Wave";
+	simSetRunning(false);
+	simCurrentFoodId = 0;
 	baInit(0, 0, "");
 	plInit(-1, 0);
 	simDraw();
+}
+function simSetRunning(running) {
+	if (running) {
+		simIsRunning = true;
+		simStartStopButton.innerHTML = "Stop Wave";
+		simPauseResumeButton.style = "display: inline-block";
+	} else {
+		simIsRunning = false;
+		simStartStopButton.innerHTML = "Start Wave";
+		simPauseResumeButton.style = "display: none";
+	}
+	simSetPause(false);
+	simUpdateRunnerTable();
+}
+function simSetPause(pause) {
+	if (pause) {
+		simIsPaused = true;
+		simPauseResumeButton.innerHTML = "Resume";
+		simStepButton.style = "display: inline-block";
+	} else {
+		simIsPaused = false;
+		simPauseResumeButton.innerHTML = "Pause";
+		simStepButton.style = "display: none";
+	}
+}
+function simPauseResumeButtonOnClick() {
+	if (simIsRunning) {
+		if (simIsPaused) {
+			simTickTimerId = setInterval(simTick, 600);
+			simSetPause(false);
+		} else {
+			clearInterval(simTickTimerId);
+			simSetPause(true);
+		}
+	}
+}
+function simStepButtonOnClick() {
+	if (simIsRunning && simIsPaused) {
+		simTick();
+	}
 }
 function simStartStopButtonOnClick() {
 	if (simIsRunning) {
@@ -53,8 +146,8 @@ function simStartStopButtonOnClick() {
 			alert("Invalid runner movements. Example: ws-s");
 			return;
 		}
-		simIsRunning = true;
-		simStartStopButton.innerHTML = "Stop Wave";
+		simSetRunning(true);
+		simSetPause(false);
 		let maxRunnersAlive = 0;
 		let totalRunners = 0;
 		let maxHealersAlive = 0;
@@ -144,9 +237,9 @@ function simParseMovementsInput() {
 function simWindowOnKeyDown(e) {
 	if (simIsRunning && plRepairCountdown === 0) {
 		if (e.key === "r") {
-			mAddItem(new fFood(plX, plY, true));
+			mAddItem(new fFood(plX, plY, true, ++simCurrentFoodId));
 		} else if (e.key === "w") {
-			mAddItem(new fFood(plX, plY, false));
+			mAddItem(new fFood(plX, plY, false, ++simCurrentFoodId));
 		} else if (e.key === "e") {
 			plShouldPickupFood = true;
 			plPathfind(plX, plY);
@@ -200,6 +293,7 @@ function simTick() {
 	baTick();
 	plTick();
 	simDraw();
+	simUpdateRunnerTable();
 }
 function simDraw() {
 	mDrawMap();
@@ -214,10 +308,16 @@ function simDraw() {
 var simTickTimerId;
 var simMovementsInput;
 var simStartStopButton;
+var simPauseResumeButton;
+var simStepButton;
 var simWaveSelect;
 var simDefLevelSelect;
 var simTickCountSpan;
 var simIsRunning;
+var simIsPaused;
+var simRunnerTable;
+var simRunnerTableBody;
+var simCurrentFoodId;
 //}
 //{ Player - pl
 function plInit(x, y) {
@@ -425,10 +525,11 @@ var plStandStillCounter;
 var plRepairCountdown;
 //}
 //{ Food - f
-function fFood(x, y, isGood) {
+function fFood(x, y, isGood, id) {
 	this.x = x;
 	this.y = y;
 	this.isGood = isGood;
+	this.id = id;
 	if (this.isGood) {
 		this.colorRed = 0;
 		this.colorGreen = 255;
@@ -524,8 +625,10 @@ function ruRunner(x, y, runnerRNG, isWave10, id) {
 	this.runnerRNG = runnerRNG;
 	this.isWave10 = isWave10;
 	this.id = id;
+	this.chat = "";
 }
 ruRunner.prototype.tick = function() {
+	this.chat = "";
 	if (++this.cycleTick > 10) {
 		this.cycleTick = 1;
 	}
@@ -788,6 +891,7 @@ ruRunner.prototype.doTick7To10 = function() {
 }
 ruRunner.prototype.print = function(string) {
 	console.log(baTickCounter + ": Runner " + this.id + ": " + string);
+	this.chat = string;
 }
 var ruSniffDistance;
 //}
@@ -860,13 +964,15 @@ function baTick() {
 			}
 			++baRunnersAlive;
 		}
-		if (baHealersAlive < baMaxHealersAlive && baHealersKilled + baHealersAlive < baTotalHealers) {
-			if (mCurrentMap === mWAVE_1_TO_9) {
-				baHealers.push(new heHealer(baWAVE1_HEALER_SPAWN_X, baWAVE1_HEALER_SPAWN_Y));
-			} else {
-				baHealers.push(new heHealer(baWAVE10_HEALER_SPAWN_X, baWAVE10_HEALER_SPAWN_Y));
+		if (ENABLE_HEALERS) {
+			if (baHealersAlive < baMaxHealersAlive && baHealersKilled + baHealersAlive < baTotalHealers) {
+				if (mCurrentMap === mWAVE_1_TO_9) {
+					baHealers.push(new heHealer(baWAVE1_HEALER_SPAWN_X, baWAVE1_HEALER_SPAWN_Y));
+				} else {
+					baHealers.push(new heHealer(baWAVE10_HEALER_SPAWN_X, baWAVE10_HEALER_SPAWN_Y));
+				}
+				++baHealersAlive;
 			}
-			++baHealersAlive;
 		}
 	}
 	simTickCountSpan.innerHTML = baTickCounter;
