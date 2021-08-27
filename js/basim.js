@@ -84,7 +84,7 @@ function simUpdateRunnerTable() {
 	let previousBody = simRunnerTable.getElementsByTagName("tbody")[0];
 	if (previousBody) simRunnerTable.removeChild(previousBody);
 	simRunnerTable.appendChild(tableBody);
-	simRunnerTable.style.display = "table";	
+	simRunnerTable.style.display = "table";
 }
 function simReset() {
 	if (simIsRunning) {
@@ -622,6 +622,7 @@ function ruRunner(x, y, runnerRNG, isWave10, id) {
 	this.standStillCounter = 0;
 	this.despawnCountdown = -1;
 	this.isDying = false;
+	this.diedThisTick = false; // Hacky solution to 1t longer despawn after urghh if stand still.
 	this.runnerRNG = runnerRNG;
 	this.isWave10 = isWave10;
 	this.id = id;
@@ -681,7 +682,14 @@ ruRunner.prototype.tick = function() {
 				++baRunnersKilled;
 				--baRunnersAlive;
 				this.print("Urghhh!");
-				this.despawnCountdown = 2;
+				if (this.diedThisTick) {
+					this.despawnCountdown = 3;
+				} else {
+					this.despawnCountdown = 2;
+				}
+			}
+			if (this.diedThisTick) {
+				this.diedThisTick = false;
 			}
 		}
 	}
@@ -750,6 +758,7 @@ ruRunner.prototype.tryEatAndCheckTarget = function() {
 					baIsNearEastTrap(this.x, this.y) && baEastTrapCharges > 0 ||
 					baIsNearWestTrap(this.x, this.y) && baWestTrapCharges > 0
 				) {
+					this.diedThisTick = true;
 					this.isDying = true;
 				}
 			} else {
