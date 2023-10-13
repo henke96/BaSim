@@ -347,11 +347,10 @@ function plTick() {
 	} else {
 		if (plShouldPickupFood) {
 			let itemZone = mGetItemZone(plX >>> 3, plY >>> 3);
-			let foodIndex = itemZone.length;
-			while (foodIndex--) {
-				let item = itemZone[foodIndex];
+			for (let i = 0; i < itemZone.length; ++i) {
+				let item = itemZone[i];
 				if (plX === item.x && plY === item.y) {
-					itemZone.splice(foodIndex, 1);
+					itemZone.splice(i, 1);
 					break;
 				}
 			}
